@@ -65,7 +65,9 @@ function isRealTime(time: string): boolean {
 function formatTrip(trip: Trip, n: number): string {
   const changes = trip.changes === 1 ? "1 change" : `${trip.changes} changes`;
   const legs = trip.legs.map((leg) => {
-    const how = `${leg.mode} ${leg.line ?? ""}${leg.towards ? ` towards ${leg.towards}` : ""}`.trim();
+    const how = [leg.mode, leg.line, leg.towards && `towards ${leg.towards}`, leg.exit && `via exit ${leg.exit}`]
+      .filter(Boolean)
+      .join(" ");
     const from = leg.platform ? `${leg.from} (platform ${leg.platform})` : leg.from;
     return `  ${leg.departure}-${leg.arrival} ${how[0]!.toUpperCase()}${how.slice(1)}: ${from} -> ${leg.to}`;
   });
