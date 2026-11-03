@@ -3,7 +3,7 @@
   "name": "io.github.Hashtagsmile/sl-mcp",
   "title": "SL – Stockholm public transport",
   "description": "Stockholm public transport (SL): live departures, trips to addresses with exits, disruptions.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "repository": {
     "url": "https://github.com/Hashtagsmile/sl-mcp",
     "source": "github"
