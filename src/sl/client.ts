@@ -15,6 +15,9 @@ export const DEVIATIONS_API = "https://deviations.integration.sl.se/v1";
 // Other ids (9021...) are stop areas without departures, so we skip them.
 const SITE_GID = /^9091001\d{9}$/;
 
+// SL treats calc_number_of_trips as a minimum and often sends more, so we also cut the list.
+const MAX_TRIPS = 3;
+
 const PRODUCT_CLASSES: Record<number, string> = {
   0: "commuter train",
   2: "metro",
@@ -118,7 +121,7 @@ export class SlClient {
       name_origin: siteGid(fromSiteId),
       type_destination: "any",
       name_destination: siteGid(toSiteId),
-      calc_number_of_trips: "3",
+      calc_number_of_trips: String(MAX_TRIPS),
       calc_one_direction: "true", // otherwise the first trip has often already left
       gen_c: "false", // skip coordinates: 156 KB -> 61 KB
     });
@@ -128,7 +131,7 @@ export class SlClient {
       params.set("itd_trip_date_time_dep_arr", options.arriveBy ? "arr" : "dep");
     }
     const data = await this.getJson<{ journeys?: RawJourney[] }>(`${JOURNEY_PLANNER_API}/trips?${params}`);
-    return (data.journeys ?? []).map((journey) => {
+    return (data.journeys ?? []).slice(0, MAX_TRIPS).map((journey) => {
       const legs = journey.legs.map(toTripLeg);
       return {
         departure: legs[0]?.departure ?? "",
