@@ -1,6 +1,6 @@
 /**
  * A small in-memory cache with a time-to-live per entry.
- * Stops change rarely (cache for a day); departures change all the time (cache for seconds).
+ * Used for disruptions: SL asks clients to fetch them at most once a minute.
  */
 export class TtlCache<T> {
   private readonly entries = new Map<string, { value: T; expiresAt: number }>();
@@ -11,12 +11,16 @@ export class TtlCache<T> {
   ) {}
 
   get(key: string): T | undefined {
-    // TODO: return the value if it has not expired, otherwise delete it and return undefined.
-    throw new Error("not implemented");
+    const entry = this.entries.get(key);
+    if (!entry) return undefined;
+    if (this.now() >= entry.expiresAt) {
+      this.entries.delete(key);
+      return undefined;
+    }
+    return entry.value;
   }
 
   set(key: string, value: T): void {
-    // TODO: store the value with expiresAt = now() + ttlMs.
-    throw new Error("not implemented");
+    this.entries.set(key, { value, expiresAt: this.now() + this.ttlMs });
   }
 }
