@@ -29,7 +29,7 @@ export interface Disruption {
 }
 
 export interface TripLeg {
-  mode: string; // "Tunnelbana", "Tåg", "Buss", "walk"
+  mode: string; // "metro", "commuter train", "bus", "walk"
   line?: string;
   towards?: string;
   from: string;

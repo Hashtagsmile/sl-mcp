@@ -74,9 +74,9 @@ describe("SlClient", () => {
     expect(urls[0]).toContain("name_destination=9091001000009511");
     expect(trip).toMatchObject({ departure: "22:57", arrival: "23:46", changes: 1 });
     expect(trip!.legs.map((l) => [l.mode, l.line])).toEqual([
-      ["Tunnelbana", "17"],
+      ["metro", "17"],
       ["walk", undefined],
-      ["Tåg", "40"],
+      ["commuter train", "40"],
     ]);
   });
 

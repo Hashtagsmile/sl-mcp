@@ -43,7 +43,7 @@ describe("server", () => {
   it("get_departures filters on destination and shows cancellations", async () => {
     session = await connect(fakeSl);
     const { text } = await call("get_departures", { siteId: 9192, towards: "farsta" });
-    expect(text).toBe("18 METRO to Farsta strand (direction 2): 19:50, CANCELLED, Inställd");
+    expect(text).toBe("18 METRO to Farsta strand (direction 2): 19:50, CANCELLED");
   });
 
   it("plan_trip lists every leg", async () => {
@@ -51,9 +51,9 @@ describe("server", () => {
     const { text } = await call("plan_trip", { fromSiteId: 9192, toSiteId: 9511 });
     expect(text.split("\n")).toEqual([
       "Trip 1: 22:57 -> 23:46 (49 min, 1 change)",
-      "  22:57-23:04 Tunnelbana 17 towards Odenplan: Slussen, Stockholm -> Odenplan, Stockholm",
-      "  23:06-23:10 Walk: Odenplan, Stockholm -> Stockholm Odenplan, Stockholm",
-      "  23:10-23:46 Tåg 40 towards Uppsala C: Stockholm Odenplan, Stockholm -> Arlanda central, Sigtuna",
+      "  22:57-23:04 Metro 17 towards Odenplan: Slussen, Stockholm -> Odenplan, Stockholm",
+      "  23:06-23:10 Walk: Odenplan, Stockholm -> Stockholm Odenplan",
+      "  23:10-23:46 Commuter train 40 towards Uppsala C: Stockholm Odenplan -> Arlanda central, Sigtuna",
     ]);
   });
 

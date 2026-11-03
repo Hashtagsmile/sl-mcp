@@ -47,12 +47,12 @@ function isRealTime(time: string): boolean {
 }
 
 // Trip 1: 22:57 -> 23:46 (49 min, 1 change)
-//   22:57-23:04 Tunnelbana 17 towards Odenplan: Slussen -> Odenplan
+//   22:57-23:04 Metro 17 towards Odenplan: Slussen, Stockholm -> Odenplan, Stockholm
 function formatTrip(trip: Trip, n: number): string {
   const changes = trip.changes === 1 ? "1 change" : `${trip.changes} changes`;
   const legs = trip.legs.map((leg) => {
-    const how = leg.mode === "walk" ? "Walk" : `${leg.mode} ${leg.line ?? ""}${leg.towards ? ` towards ${leg.towards}` : ""}`;
-    return `  ${leg.departure}-${leg.arrival} ${how.trim()}: ${leg.from} -> ${leg.to}`;
+    const how = `${leg.mode} ${leg.line ?? ""}${leg.towards ? ` towards ${leg.towards}` : ""}`.trim();
+    return `  ${leg.departure}-${leg.arrival} ${how[0]!.toUpperCase()}${how.slice(1)}: ${leg.from} -> ${leg.to}`;
   });
   return [`Trip ${n}: ${trip.departure} -> ${trip.arrival} (${trip.minutes} min, ${changes})`, ...legs].join("\n");
 }

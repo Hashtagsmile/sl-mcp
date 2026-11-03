@@ -158,7 +158,7 @@ export class SlClient {
       return {
         departure: legs[0]?.departure ?? "",
         arrival: legs.at(-1)?.arrival ?? "",
-        minutes: Math.round((journey.tripRtDuration ?? journey.tripDuration) / 60),
+        minutes: Math.max(1, Math.round((journey.tripRtDuration ?? journey.tripDuration) / 60)),
         changes: journey.interchanges,
         legs,
       };
@@ -213,14 +213,20 @@ function toTripLeg(leg: RawLeg): TripLeg {
   const t = leg.transportation;
   const walk = t?.product?.name === "footpath";
   return {
-    mode: walk ? "walk" : (t?.product?.name ?? "unknown"),
+    mode: walk ? "walk" : (PRODUCT_CLASSES[t?.product?.class ?? -1] ?? t?.product?.name ?? "unknown"),
     line: walk ? undefined : t?.disassembledName,
     towards: walk ? undefined : t?.destination?.name,
-    from: leg.origin.name,
-    to: leg.destination.name,
+    from: shortName(leg.origin.name),
+    to: shortName(leg.destination.name),
     departure: stockholmTime.format(new Date(leg.origin.departureTimeEstimated ?? leg.origin.departureTimePlanned)),
     arrival: stockholmTime.format(new Date(leg.destination.arrivalTimeEstimated ?? leg.destination.arrivalTimePlanned)),
   };
+}
+
+/** "Stockholm Odenplan, Stockholm" -> "Stockholm Odenplan". "Odenplan, Stockholm" stays. */
+function shortName(name: string): string {
+  const [place, town] = name.split(", ");
+  return town && place!.includes(town) ? place! : name;
 }
 
 // The parts of SL's responses we read.
@@ -258,5 +264,5 @@ interface RawJourney {
 interface RawLeg {
   origin: { name: string; departureTimePlanned: string; departureTimeEstimated?: string };
   destination: { name: string; arrivalTimePlanned: string; arrivalTimeEstimated?: string };
-  transportation?: { disassembledName?: string; product?: { name: string }; destination?: { name: string } };
+  transportation?: { disassembledName?: string; product?: { class?: number; name: string }; destination?: { name: string } };
 }
