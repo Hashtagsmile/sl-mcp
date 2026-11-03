@@ -93,6 +93,30 @@ describe("SlClient", () => {
     await expect(sl.planTrip(9192, 9511)).resolves.toHaveLength(3);
   });
 
+  it("findPlace finds addresses too", async () => {
+    const { sl, urls } = fakeClient({ locations: [{ id: "streetID:1500001491:76", name: "Stockholm, Götgatan 76" }] });
+
+    await expect(sl.findPlace("Götgatan 76")).resolves.toEqual({
+      id: "streetID:1500001491:76",
+      name: "Stockholm, Götgatan 76",
+    });
+    expect(urls[0]).toContain("any_obj_filter_sf=0");
+  });
+
+  it("planTrip passes a place id through and merges back-to-back walks", async () => {
+    const walk = (from: string, to: string) => ({
+      origin: { name: from, departureTimePlanned: "2026-11-03T22:35:00Z" },
+      destination: { name: to, arrivalTimePlanned: "2026-11-03T22:41:00Z" },
+      transportation: { product: { class: 99, name: "footpath" } },
+    });
+    const journey = { tripDuration: 360, interchanges: 0, legs: [walk("A", "B"), walk("B", "Götgatan 76")] };
+    const { sl, urls } = fakeClient({ journeys: [journey] });
+
+    const [trip] = await sl.planTrip(9191, "streetID:1500001491:76");
+    expect(urls[0]).toContain(`name_destination=${encodeURIComponent("streetID:1500001491:76")}`);
+    expect(trip!.legs).toMatchObject([{ mode: "walk", from: "A", to: "Götgatan 76" }]);
+  });
+
   it("planTrip drops trips that arrive after an arrive-by time", async () => {
     const { sl } = fakeClient(trips); // the trip arrives 23:46
 

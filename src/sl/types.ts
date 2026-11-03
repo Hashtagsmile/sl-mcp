@@ -9,6 +9,12 @@ export interface Stop {
   modes: string[]; // "metro", "bus", ...
 }
 
+/** An address, stop or landmark that plan_trip can start or end at. */
+export interface Place {
+  id: string; // SL's own id, e.g. "streetID:..."
+  name: string; // "Stockholm, Götgatan 76"
+}
+
 export interface Departure {
   line: string;
   transportMode: TransportMode;

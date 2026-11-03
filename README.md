@@ -7,6 +7,7 @@ about departures, disruptions and trips in plain Swedish or English.
 När går nästa tunnelbana från Slussen mot Ropsten?
 Är det några störningar på röda linjen?
 How do I get from Odenplan to Arlanda?
+Hur tar jag mig från Sundbyberg till Götgatan 76?
 ```
 
 It uses SL's open APIs, which don't need an API key.
@@ -16,7 +17,7 @@ It uses SL's open APIs, which don't need an API key.
 - `find_stop`: search for a stop by name and get its id
 - `get_departures`: upcoming departures from a stop, optionally by mode, line or destination
 - `get_disruptions`: announced disruptions for one or more lines
-- `plan_trip`: trips between two stops, with changes and walks
+- `plan_trip`: trips between two stops or street addresses, with changes and walks
 
 ## Install
 

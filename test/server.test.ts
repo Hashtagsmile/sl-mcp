@@ -55,7 +55,7 @@ describe("server", () => {
 
   it("plan_trip lists every leg", async () => {
     session = await connect(fakeSl);
-    const { text } = await call("plan_trip", { fromSiteId: 9192, toSiteId: 9511 });
+    const { text } = await call("plan_trip", { from: 9192, to: 9511 });
     expect(text.split("\n")).toEqual([
       "Trip 1: 22:57 -> 23:46 (49 min, 1 change)",
       "  22:57-23:04 Metro 17 towards Odenplan: Slussen, Stockholm -> Odenplan, Stockholm",
@@ -64,17 +64,27 @@ describe("server", () => {
     ]);
   });
 
+  it("plan_trip says which place an address matched", async () => {
+    const place = { locations: [{ id: "streetID:1", name: "Stockholm, Götgatan 76" }] };
+    const sl = new SlClient({
+      fetch: async (input) => new Response(JSON.stringify(String(input).includes("/stop-finder") ? place : trips)),
+    });
+    session = await connect(sl);
+    const { text } = await call("plan_trip", { from: 9192, to: "Götgatan 76" });
+    expect(text).toMatch(/^"Götgatan 76" matched Stockholm, Götgatan 76\n\nTrip 1:/);
+  });
+
   it("plan_trip explains an error SL gives a code for", async () => {
     const body = { systemMessages: [{ type: "error", code: -8020, text: "origin: no matches" }] };
     session = await connect(new SlClient({ fetch: async () => new Response(JSON.stringify(body)) }));
-    const { text, isError } = await call("plan_trip", { fromSiteId: 1, toSiteId: 9511 });
+    const { text, isError } = await call("plan_trip", { from: 1, to: 9511 });
     expect(isError).toBe(true);
     expect(text).toBe("SL does not know one of the stop ids. Get them from find_stop.");
   });
 
   it("plan_trip rejects a date that does not exist", async () => {
     session = await connect(fakeSl);
-    const { text, isError } = await call("plan_trip", { fromSiteId: 9192, toSiteId: 9511, time: "2026-02-30T25:99" });
+    const { text, isError } = await call("plan_trip", { from: 9192, to: 9511, time: "2026-02-30T25:99" });
     expect(isError).toBe(true);
     expect(text).toContain("Not a real date and time");
   });
