@@ -103,18 +103,20 @@ describe("SlClient", () => {
     expect(urls[0]).toContain("any_obj_filter_sf=0");
   });
 
-  it("planTrip passes a place id through and merges back-to-back walks", async () => {
+  it("planTrip passes a place id through and merges back-to-back walks, keeping the exit", async () => {
     const walk = (from: string, to: string) => ({
       origin: { name: from, departureTimePlanned: "2026-11-03T22:35:00Z" },
       destination: { name: to, arrivalTimePlanned: "2026-11-03T22:41:00Z" },
       transportation: { product: { class: 99, name: "footpath" } },
     });
-    const journey = { tripDuration: 360, interchanges: 0, legs: [walk("A", "B"), walk("B", "Götgatan 76")] };
+    const exit = { properties: { areaName: "Folkungagatan Götgatan", areaType: 32 } };
+    const toExit = { ...walk("A", "B"), footPathInfo: [{ footPathElem: [{ destination: exit }] }] };
+    const journey = { tripDuration: 360, interchanges: 0, legs: [toExit, walk("B", "Götgatan 76")] };
     const { sl, urls } = fakeClient({ journeys: [journey] });
 
     const [trip] = await sl.planTrip(9191, "streetID:1500001491:76");
     expect(urls[0]).toContain(`name_destination=${encodeURIComponent("streetID:1500001491:76")}`);
-    expect(trip!.legs).toMatchObject([{ mode: "walk", from: "A", to: "Götgatan 76" }]);
+    expect(trip!.legs).toEqual([expect.objectContaining({ mode: "walk", to: "Götgatan 76", exit: "Folkungagatan Götgatan" })]);
   });
 
   it("planTrip drops trips that arrive after an arrive-by time", async () => {

@@ -39,6 +39,7 @@ export interface TripLeg {
   line?: string;
   towards?: string;
   platform?: string; // where it leaves from: track for trains, platform for metro, stop letter for buses
+  exit?: string; // walks only: the station entrance used, in or out ("uppgång"), e.g. "Folkungagatan Götgatan"
   from: string;
   to: string;
   departure: string; // HH:MM Stockholm time

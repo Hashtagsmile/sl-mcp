@@ -173,8 +173,9 @@ export class SlClient {
       for (const leg of journey.legs.map(toTripLeg)) {
         const previous = legs.at(-1);
         // SL splits a walk at a station exit, e.g. "Medborgarplatsen -> Medborgarplatsen -> Götgatan 76".
-        if (previous?.mode === "walk" && leg.mode === "walk") Object.assign(previous, { to: leg.to, arrival: leg.arrival });
-        else legs.push(leg);
+        if (previous?.mode === "walk" && leg.mode === "walk") {
+          Object.assign(previous, { to: leg.to, arrival: leg.arrival, exit: previous.exit ?? leg.exit });
+        } else legs.push(leg);
       }
       return {
         departure: legs[0]?.departure ?? "",
@@ -240,9 +241,19 @@ function toTripLeg(leg: RawLeg): TripLeg {
     from: shortName(leg.origin.name),
     to: shortName(leg.destination.name),
     platform: walk ? undefined : leg.origin.properties?.platformName,
+    exit: walk ? exitOf(leg) : undefined,
     departure: stockholmTime.format(new Date(leg.origin.departureTimeEstimated ?? leg.origin.departureTimePlanned)),
     arrival: stockholmTime.format(new Date(leg.destination.arrivalTimeEstimated ?? leg.destination.arrivalTimePlanned)),
   };
+}
+
+// In SL's walk details, area type 32 is a station entrance, e.g. "Folkungagatan Götgatan" at Medborgarplatsen.
+const ENTRANCE_AREA = 32;
+
+/** The station entrance a walk goes through, in or out. */
+function exitOf(leg: RawLeg): string | undefined {
+  const areas = (leg.footPathInfo ?? []).flatMap((f) => f.footPathElem ?? []).flatMap((e) => [e.origin, e.destination]);
+  return areas.find((area) => area?.properties?.areaType === ENTRANCE_AREA)?.properties?.areaName;
 }
 
 /** "Stockholm Odenplan, Stockholm" -> "Stockholm Odenplan". "Odenplan, Stockholm" stays. */
@@ -292,4 +303,9 @@ interface RawLeg {
   };
   destination: { name: string; arrivalTimePlanned: string; arrivalTimeEstimated?: string };
   transportation?: { disassembledName?: string; product?: { class?: number; name: string }; destination?: { name: string } };
+  footPathInfo?: { footPathElem?: { origin?: RawArea; destination?: RawArea }[] }[];
+}
+
+interface RawArea {
+  properties?: { areaName?: string; areaType?: number };
 }
