@@ -80,6 +80,13 @@ describe("SlClient", () => {
     ]);
   });
 
+  it("planTrip returns at most 3 trips even if SL sends more", async () => {
+    const journey = trips.journeys[0];
+    const { sl } = fakeClient({ ...trips, journeys: Array(6).fill(journey) });
+
+    await expect(sl.planTrip(9192, 9511)).resolves.toHaveLength(3);
+  });
+
   it("retries when SL answers 429", async () => {
     let calls = 0;
     const sl = new SlClient({
