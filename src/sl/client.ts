@@ -94,6 +94,7 @@ export class SlClient {
       scheduled: d.scheduled,
       expected: d.expected ?? d.scheduled,
       cancelled: d.state === "CANCELLED",
+      platform: d.stop_point?.designation,
       deviations: (d.deviations ?? []).map((deviation) => deviation.message),
     }));
   }
@@ -278,6 +279,7 @@ interface RawDeparture {
   scheduled: string;
   expected?: string;
   line: { designation: string; transport_mode: TransportMode };
+  stop_point?: { designation?: string };
   deviations?: { message: string }[];
 }
 

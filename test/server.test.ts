@@ -52,10 +52,10 @@ describe("server", () => {
     expect(isError).toBe(true);
   });
 
-  it("get_departures filters on destination and shows cancellations", async () => {
+  it("get_departures filters on destination and shows platform and cancellations", async () => {
     session = await connect(fakeSl);
     const { text } = await call("get_departures", { siteId: 9192, towards: "farsta" });
-    expect(text).toBe("18 METRO to Farsta strand (direction 2): 19:50, CANCELLED");
+    expect(text).toBe("18 METRO to Farsta strand (direction 2, platform 4): 19:50, CANCELLED");
   });
 
   it("plan_trip lists every leg", async () => {
