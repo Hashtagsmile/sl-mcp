@@ -2,6 +2,7 @@ import type { CallToolResult } from "@modelcontextprotocol/client";
 import { afterEach, describe, expect, it } from "vitest";
 import { SlClient } from "../src/sl/client.js";
 import departures from "./fixtures/departures.json" with { type: "json" };
+import deviations from "./fixtures/deviations.json" with { type: "json" };
 import stopFinder from "./fixtures/stop-finder.json" with { type: "json" };
 import trips from "./fixtures/trips.json" with { type: "json" };
 import { connect } from "./harness.js";
@@ -70,6 +71,13 @@ describe("server", () => {
     const { text, isError } = await call("plan_trip", { fromSiteId: 9192, toSiteId: 9511, time: "2026-02-30T25:99" });
     expect(isError).toBe(true);
     expect(text).toContain("Not a real date and time");
+  });
+
+  it("get_disruptions understands metro colours", async () => {
+    session = await connect(new SlClient({ fetch: async () => new Response(JSON.stringify(deviations)) }));
+    const { text } = await call("get_disruptions", { lines: ["grön linje"] });
+    expect(text).toMatch(/^Lines 19, 18, 17: Avstängd hiss vid Brommaplan/);
+    expect(text).not.toContain("Östermalmstorg");
   });
 
   it("returns an error result when SL is down", async () => {
