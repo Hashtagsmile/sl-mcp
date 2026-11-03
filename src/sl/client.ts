@@ -1,47 +1,222 @@
-import type { Departure, Disruption, Stop, TransportMode } from "./types.js";
+import { TtlCache } from "../lib/cache.js";
+import type { Departure, Disruption, Stop, TransportMode, Trip, TripLeg } from "./types.js";
 
-// SL's open APIs (no key needed). Docs: https://www.trafiklab.se/api/
-//   GET {TRANSPORT_API}/sites?expand=false            all ~6 500 stops, no search parameter
-//   GET {TRANSPORT_API}/sites/{siteId}/departures     upcoming departures
-//   GET {DEVIATIONS_API}/messages?future=false        current disruptions
+// SL's open APIs (no key needed). Notes from testing them: docs/sl-api.md (local, not in git).
+//   GET {JOURNEY_PLANNER_API}/stop-finder   stop search, done by SL
+//   GET {JOURNEY_PLANNER_API}/trips         trip planning from A to B
+//   GET {TRANSPORT_API}/sites/{id}/departures
+//   GET {DEVIATIONS_API}/messages           announced disruptions
 // Example responses: test/fixtures/
+export const JOURNEY_PLANNER_API = "https://journeyplanner.integration.sl.se/v2";
 export const TRANSPORT_API = "https://transport.integration.sl.se/v1";
 export const DEVIATIONS_API = "https://deviations.integration.sl.se/v1";
+
+// stop-finder ids for sites look like 9091001 + 3-digit name variant + 6-digit site id.
+// Other ids (9021...) are stop areas without departures, so we skip them.
+const SITE_GID = /^9091001\d{9}$/;
+
+const PRODUCT_CLASSES: Record<number, string> = {
+  0: "commuter train",
+  2: "metro",
+  4: "tram",
+  5: "bus",
+  9: "boat",
+  14: "train",
+};
 
 export interface SlClientOptions {
   /** Swap in a fake fetch in tests. */
   fetch?: typeof fetch;
   timeoutMs?: number;
+  /** Waits before each retry when SL answers 429 (too many requests). */
+  retryDelaysMs?: number[];
 }
 
 export class SlClient {
   private readonly fetch: typeof fetch;
   private readonly timeoutMs: number;
+  private readonly retryDelaysMs: number[];
+  // SL asks for at most one disruptions request a minute.
+  private readonly disruptions = new TtlCache<RawMessage[]>(60_000);
 
   constructor(options: SlClientOptions = {}) {
     this.fetch = options.fetch ?? globalThis.fetch;
     this.timeoutMs = options.timeoutMs ?? 10_000;
+    this.retryDelaysMs = options.retryDelaysMs ?? [300, 1000];
   }
 
-  /** Stops whose name matches the query, best matches first. */
+  /** Stops whose name matches the query, in SL's order. SL handles case and typos. */
   async findStop(query: string, limit = 5): Promise<Stop[]> {
-    // TODO: fetch (and cache) all sites, match on a normalized name, map to Stop.
-    throw new Error("not implemented");
+    const params = new URLSearchParams({ name_sf: query, type_sf: "any", any_obj_filter_sf: "2" });
+    const data = await this.getJson<{ locations?: RawLocation[] }>(`${JOURNEY_PLANNER_API}/stop-finder?${params}`);
+    const stops: Stop[] = [];
+    for (const location of data.locations ?? []) {
+      if (!SITE_GID.test(location.id)) continue;
+      const id = Number(location.id.slice(-6));
+      if (stops.some((stop) => stop.id === id)) continue;
+      const modes = (location.productClasses ?? []).map((c) => PRODUCT_CLASSES[c]).filter((m) => m !== undefined);
+      stops.push({ id, name: location.name, modes });
+    }
+    return stops.slice(0, limit);
   }
 
-  async getDepartures(siteId: number): Promise<Departure[]> {
-    // TODO: fetch departures for the site and map to Departure.
-    throw new Error("not implemented");
+  async getDepartures(
+    siteId: number,
+    filter: { transportMode?: TransportMode; forecastMinutes?: number } = {},
+  ): Promise<Departure[]> {
+    const params = new URLSearchParams();
+    if (filter.transportMode) params.set("transport", filter.transportMode);
+    if (filter.forecastMinutes) params.set("forecast", String(filter.forecastMinutes));
+    const data = await this.getJson<{ departures: RawDeparture[] }>(
+      `${TRANSPORT_API}/sites/${siteId}/departures?${params}`,
+    );
+    return data.departures.map((d) => ({
+      line: d.line.designation,
+      transportMode: d.line.transport_mode,
+      destination: d.destination,
+      direction: d.direction_code,
+      display: d.display,
+      scheduled: d.scheduled,
+      expected: d.expected ?? d.scheduled,
+      cancelled: d.state === "CANCELLED",
+      deviations: (d.deviations ?? []).map((deviation) => deviation.message),
+    }));
   }
 
-  async getDisruptions(filter: { line?: string; transportMode?: TransportMode } = {}): Promise<Disruption[]> {
-    // TODO: fetch messages, filter, map to Disruption.
-    throw new Error("not implemented");
+  /** Current disruptions, optionally only for some line numbers or one transport mode. */
+  async getDisruptions(filter: { lines?: string[]; transportMode?: TransportMode } = {}): Promise<Disruption[]> {
+    let messages = this.disruptions.get("all");
+    if (!messages) {
+      messages = await this.getJson<RawMessage[]>(`${DEVIATIONS_API}/messages`);
+      this.disruptions.set("all", messages);
+    }
+    return messages
+      .filter((m) => {
+        const lines = m.scope?.lines ?? [];
+        if (filter.lines?.length && !lines.some((l) => filter.lines!.includes(l.designation))) return false;
+        if (filter.transportMode && !lines.some((l) => l.transport_mode === filter.transportMode)) return false;
+        return true;
+      })
+      .map((m) => {
+        const variant = m.message_variants[0];
+        return {
+          header: variant?.header ?? "",
+          details: variant?.details.trim() ?? "",
+          lines: (m.scope?.lines ?? []).map((l) => l.designation),
+          until: m.publish?.upto,
+        };
+      });
   }
 
-  /** GET a URL and parse JSON, with a timeout and a clear error on non-2xx. */
+  /**
+   * Up to 3 trips between two sites. `time` is Stockholm time "YYYY-MM-DDTHH:MM";
+   * without it, trips leave from now.
+   */
+  async planTrip(fromSiteId: number, toSiteId: number, options: { time?: string; arriveBy?: boolean } = {}): Promise<Trip[]> {
+    const params = new URLSearchParams({
+      type_origin: "any",
+      name_origin: siteGid(fromSiteId),
+      type_destination: "any",
+      name_destination: siteGid(toSiteId),
+      calc_number_of_trips: "3",
+      calc_one_direction: "true", // otherwise the first trip has often already left
+      gen_c: "false", // skip coordinates: 156 KB -> 61 KB
+    });
+    if (options.time) {
+      params.set("itd_date", options.time.slice(0, 10).replaceAll("-", ""));
+      params.set("itd_time", options.time.slice(11, 16).replace(":", ""));
+      params.set("itd_trip_date_time_dep_arr", options.arriveBy ? "arr" : "dep");
+    }
+    const data = await this.getJson<{ journeys?: RawJourney[] }>(`${JOURNEY_PLANNER_API}/trips?${params}`);
+    return (data.journeys ?? []).map((journey) => {
+      const legs = journey.legs.map(toTripLeg);
+      return {
+        departure: legs[0]?.departure ?? "",
+        arrival: legs.at(-1)?.arrival ?? "",
+        minutes: Math.round((journey.tripRtDuration ?? journey.tripDuration) / 60),
+        changes: journey.interchanges,
+        legs,
+      };
+    });
+  }
+
+  /** GET a URL and parse JSON, with a timeout, retries on 429 and a clear error on non-2xx. */
   private async getJson<T>(url: string): Promise<T> {
-    // TODO: use this.fetch with AbortSignal.timeout(this.timeoutMs).
-    throw new Error("not implemented");
+    for (let attempt = 0; ; attempt++) {
+      const response = await this.fetch(url, {
+        headers: { accept: "application/json" },
+        signal: AbortSignal.timeout(this.timeoutMs),
+      });
+      if (response.status === 429 && attempt < this.retryDelaysMs.length) {
+        await new Promise((resolve) => setTimeout(resolve, this.retryDelaysMs[attempt]));
+        continue;
+      }
+      if (!response.ok) {
+        throw new Error(`SL API answered ${response.status} ${response.statusText} for ${url}`);
+      }
+      return (await response.json()) as T;
+    }
   }
+}
+
+function siteGid(siteId: number): string {
+  return `9091001${String(siteId).padStart(9, "0")}`;
+}
+
+const stockholmTime = new Intl.DateTimeFormat("sv-SE", {
+  timeZone: "Europe/Stockholm",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+function toTripLeg(leg: RawLeg): TripLeg {
+  const t = leg.transportation;
+  const walk = t?.product?.name === "footpath";
+  return {
+    mode: walk ? "walk" : (t?.product?.name ?? "unknown"),
+    line: walk ? undefined : t?.disassembledName,
+    towards: walk ? undefined : t?.destination?.name,
+    from: leg.origin.name,
+    to: leg.destination.name,
+    departure: stockholmTime.format(new Date(leg.origin.departureTimeEstimated ?? leg.origin.departureTimePlanned)),
+    arrival: stockholmTime.format(new Date(leg.destination.arrivalTimeEstimated ?? leg.destination.arrivalTimePlanned)),
+  };
+}
+
+// The parts of SL's responses we read.
+
+interface RawLocation {
+  id: string;
+  name: string;
+  productClasses?: number[];
+}
+
+interface RawDeparture {
+  destination: string;
+  direction_code: number;
+  state: string;
+  display: string;
+  scheduled: string;
+  expected?: string;
+  line: { designation: string; transport_mode: TransportMode };
+  deviations?: { message: string }[];
+}
+
+interface RawMessage {
+  message_variants: { header: string; details: string }[];
+  scope?: { lines?: { designation: string; transport_mode: TransportMode }[] };
+  publish?: { upto?: string };
+}
+
+interface RawJourney {
+  tripDuration: number;
+  tripRtDuration?: number;
+  interchanges: number;
+  legs: RawLeg[];
+}
+
+interface RawLeg {
+  origin: { name: string; departureTimePlanned: string; departureTimeEstimated?: string };
+  destination: { name: string; arrivalTimePlanned: string; arrivalTimeEstimated?: string };
+  transportation?: { disassembledName?: string; product?: { name: string }; destination?: { name: string } };
 }

@@ -1,0 +1,163 @@
+{
+  "locations": [
+    {
+      "coord": [
+        59.650885,
+        17.931361
+      ],
+      "disassembledName": "Arlanda central (pendeltåg)",
+      "id": "9091001000009511",
+      "isBest": false,
+      "isGlobalId": true,
+      "matchQuality": 950,
+      "name": "Sigtuna, Arlanda central (pendeltåg)",
+      "parent": {
+        "id": "placeID:33001091:1",
+        "name": "Sigtuna",
+        "type": "locality"
+      },
+      "productClasses": [
+        0,
+        14
+      ],
+      "properties": {
+        "mainLocality": "Sigtuna",
+        "stopId": "18009511"
+      },
+      "type": "stop"
+    },
+    {
+      "coord": [
+        59.617153,
+        17.838826
+      ],
+      "disassembledName": "Arlandagymnasiet",
+      "id": "9091001000005047",
+      "isBest": true,
+      "isGlobalId": true,
+      "matchQuality": 953,
+      "name": "Sigtuna, Arlandagymnasiet",
+      "parent": {
+        "id": "placeID:33001091:1",
+        "name": "Sigtuna",
+        "type": "locality"
+      },
+      "productClasses": [
+        5
+      ],
+      "properties": {
+        "mainLocality": "Sigtuna",
+        "stopId": "18005047"
+      },
+      "type": "stop"
+    },
+    {
+      "coord": [
+        59.647739,
+        17.928594
+      ],
+      "disassembledName": "Arlanda terminal 4 (Endast UL-buss)",
+      "id": "9091001000005004",
+      "isBest": false,
+      "isGlobalId": true,
+      "matchQuality": 940,
+      "name": "Sigtuna, Arlanda terminal 4 (Endast UL-buss)",
+      "parent": {
+        "id": "placeID:33001091:1",
+        "name": "Sigtuna",
+        "type": "locality"
+      },
+      "productClasses": [
+        5
+      ],
+      "properties": {
+        "mainLocality": "Sigtuna",
+        "stopId": "18005227"
+      },
+      "type": "stop"
+    },
+    {
+      "coord": [
+        59.650916,
+        17.931361
+      ],
+      "disassembledName": "Arlanda terminal 5 buss",
+      "id": "9021001057308000",
+      "isBest": false,
+      "isGlobalId": true,
+      "matchQuality": 932,
+      "name": "Sigtuna, Arlanda terminal 5 buss",
+      "parent": {
+        "id": "placeID:33001091:1",
+        "name": "Sigtuna",
+        "type": "locality"
+      },
+      "productClasses": [
+        5
+      ],
+      "properties": {
+        "mainLocality": "Sigtuna",
+        "stopId": "18100138"
+      },
+      "type": "stop"
+    },
+    {
+      "coord": [
+        59.644216,
+        17.930023
+      ],
+      "disassembledName": "Arlanda terminal 2 och 3",
+      "id": "9091001000005002",
+      "isBest": false,
+      "isGlobalId": true,
+      "matchQuality": 929,
+      "name": "Sigtuna, Arlanda terminal 2 och 3",
+      "parent": {
+        "id": "placeID:33001091:1",
+        "name": "Sigtuna",
+        "type": "locality"
+      },
+      "productClasses": [
+        5
+      ],
+      "properties": {
+        "mainLocality": "Sigtuna",
+        "stopId": "18005002"
+      },
+      "type": "stop"
+    },
+    {
+      "coord": [
+        59.648987,
+        17.930175
+      ],
+      "disassembledName": "Arlanda Sky City/Terminal 4 och 5",
+      "id": "9091001001005006",
+      "isBest": false,
+      "isGlobalId": true,
+      "matchQuality": 921,
+      "name": "Sigtuna, Arlanda Sky City/Terminal 4 och 5",
+      "parent": {
+        "id": "placeID:33001091:1",
+        "name": "Sigtuna",
+        "type": "locality"
+      },
+      "productClasses": [
+        5
+      ],
+      "properties": {
+        "mainLocality": "Sigtuna",
+        "stopId": "18005398"
+      },
+      "type": "stop"
+    }
+  ],
+  "systemMessages": [
+    {
+      "code": -8011,
+      "module": "BROKER",
+      "text": "",
+      "type": "error"
+    }
+  ]
+}

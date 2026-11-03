@@ -1,0 +1,171 @@
+{
+  "journeys": [
+    {
+      "tripDuration": 2952,
+      "tripRtDuration": 2940,
+      "rating": 0,
+      "isAdditional": false,
+      "interchanges": 1,
+      "legs": [
+        {
+          "infos": [],
+          "duration": 426,
+          "origin": {
+            "isGlobalId": true,
+            "id": "9025001000001011",
+            "name": "Slussen, Stockholm",
+            "disassembledName": "1",
+            "type": "platform",
+            "departureTimeBaseTimetable": "2026-11-03T21:56:48Z",
+            "departureTimePlanned": "2026-11-03T21:56:48Z",
+            "departureTimeEstimated": "2026-11-03T21:57:00Z"
+          },
+          "destination": {
+            "isGlobalId": true,
+            "id": "9025001000001131",
+            "name": "Odenplan, Stockholm",
+            "disassembledName": "1",
+            "type": "platform",
+            "arrivalTimeBaseTimetable": "2026-11-03T22:04:48Z",
+            "arrivalTimePlanned": "2026-11-03T22:04:48Z",
+            "arrivalTimeEstimated": "2026-11-03T22:04:06Z"
+          },
+          "transportation": {
+            "id": "tfs:02017: :H:y01",
+            "name": "Tunnelbana tunnelbanans gröna linje 17",
+            "number": "tunnelbanans gröna linje 17",
+            "product": {
+              "id": 8,
+              "class": 2,
+              "name": "Tunnelbana",
+              "iconId": 1
+            },
+            "operator": {
+              "id": "1",
+              "name": "Storstockholms Lokaltrafik"
+            },
+            "destination": {
+              "id": "18001131",
+              "name": "Odenplan",
+              "type": "stop"
+            },
+            "properties": {
+              "tripCode": 163,
+              "timetablePeriod": "Current",
+              "lineDisplay": "LINE",
+              "globalId": "9011001001700000",
+              "RealtimeTripId": "9015001001711264",
+              "shortTrain": false,
+              "AVMSTripID": "9015001001711264"
+            },
+            "isSamtrafik": false,
+            "disassembledName": "17"
+          },
+          "realtimeStatus": [
+            "MONITORED"
+          ],
+          "isRealtimeControlled": true
+        },
+        {
+          "infos": [],
+          "duration": 240,
+          "origin": {
+            "isGlobalId": true,
+            "id": "9025001000001131",
+            "name": "Odenplan, Stockholm",
+            "disassembledName": "1",
+            "type": "platform",
+            "departureTimeBaseTimetable": "2026-11-03T22:06:00Z",
+            "departureTimePlanned": "2026-11-03T22:06:00Z",
+            "departureTimeEstimated": "2026-11-03T22:06:00Z"
+          },
+          "destination": {
+            "isGlobalId": true,
+            "id": "9025001000005320",
+            "name": "Stockholm Odenplan, Stockholm",
+            "disassembledName": "1",
+            "type": "platform",
+            "arrivalTimeBaseTimetable": "2026-11-03T22:10:00Z",
+            "arrivalTimePlanned": "2026-11-03T22:10:00Z",
+            "arrivalTimeEstimated": "2026-11-03T22:10:00Z"
+          },
+          "transportation": {
+            "product": {
+              "class": 99,
+              "name": "footpath",
+              "iconId": 99
+            },
+            "properties": {
+              "tripCode": 0,
+              "lineDisplay": "LINE"
+            },
+            "isSamtrafik": false
+          }
+        },
+        {
+          "infos": [],
+          "duration": 2160,
+          "origin": {
+            "isGlobalId": true,
+            "id": "9025001000005320",
+            "name": "Stockholm Odenplan, Stockholm",
+            "disassembledName": "1",
+            "type": "platform",
+            "departureTimeBaseTimetable": "2026-11-03T22:10:00Z",
+            "departureTimePlanned": "2026-11-03T22:10:00Z",
+            "departureTimeEstimated": "2026-11-03T22:10:00Z"
+          },
+          "destination": {
+            "isGlobalId": true,
+            "id": "9025001000005001",
+            "name": "Arlanda central, Sigtuna",
+            "disassembledName": "1",
+            "type": "platform",
+            "arrivalTimeBaseTimetable": "2026-11-03T22:46:00Z",
+            "arrivalTimePlanned": "2026-11-03T22:46:00Z",
+            "arrivalTimeEstimated": "2026-11-03T22:46:00Z"
+          },
+          "transportation": {
+            "id": "tfs:04040: :R:y01",
+            "name": "Tåg Pendeltåg 40",
+            "number": "Pendeltåg 40",
+            "product": {
+              "id": 1,
+              "class": 0,
+              "name": "Tåg",
+              "iconId": 6
+            },
+            "operator": {
+              "id": "1",
+              "name": "Storstockholms Lokaltrafik"
+            },
+            "destination": {
+              "id": "18005007",
+              "name": "Uppsala C",
+              "type": "stop"
+            },
+            "properties": {
+              "tripCode": 719,
+              "timetablePeriod": "Current",
+              "lineDisplay": "LINE",
+              "globalId": "9011001004000000",
+              "RealtimeTripId": "9015001004002276",
+              "shortTrain": true
+            },
+            "isSamtrafik": false,
+            "disassembledName": "40"
+          }
+        }
+      ],
+      "remarks": [
+        {
+          "type": "arlanda",
+          "text": "Du behöver en Arlanda passagebiljett."
+        }
+      ],
+      "daysOfService": {
+        "rvb": "0000000000000000000000000000000400000000000000000000000000000000000000000000000000000000"
+      }
+    }
+  ]
+}
