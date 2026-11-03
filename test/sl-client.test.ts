@@ -119,6 +119,20 @@ describe("SlClient", () => {
     expect(trip!.legs).toEqual([expect.objectContaining({ mode: "walk", to: "Götgatan 76", exit: "Folkungagatan Götgatan" })]);
   });
 
+  it("planTrip asks SL for only the given modes and the preferred route", async () => {
+    const { sl, urls } = fakeClient(trips);
+
+    await sl.planTrip(9192, 2800, { modes: ["boat", "bus"], prefer: "fewest changes" });
+    const params = new URL(urls[0]!).searchParams;
+    expect([...params.keys()].filter((key) => key.startsWith("incl_mot_"))).toEqual([
+      "incl_mot_9",
+      "incl_mot_5",
+      "incl_mot_10",
+      "incl_mot_19",
+    ]);
+    expect(params.get("route_type")).toBe("leastinterchange");
+  });
+
   it("planTrip drops trips that arrive after an arrive-by time", async () => {
     const { sl } = fakeClient(trips); // the trip arrives 23:46
 

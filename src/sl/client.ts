@@ -1,5 +1,5 @@
 import { TtlCache } from "../lib/cache.js";
-import type { Departure, Disruption, Place, Stop, TransportMode, Trip, TripLeg } from "./types.js";
+import type { Departure, Disruption, Place, Stop, TransportMode, Trip, TripLeg, TripMode, TripPreference } from "./types.js";
 
 // SL's open APIs (no key needed). Notes from testing them: docs/sl-api.md (local, not in git).
 //   GET {JOURNEY_PLANNER_API}/stop-finder   stop search, done by SL
@@ -32,6 +32,22 @@ const TRIP_ERRORS: Record<number, string> = {
   [-8020]: "SL does not know one of the stop ids. Get them from find_stop.",
   [-4007]: "Start and destination are the same stop, or too close to plan a trip between.",
   [-4001]: "SL cannot plan trips at that time. It is outside the current timetable, e.g. in the past.",
+};
+
+// SL's incl_mot_N ids per mode. Bus also covers on-demand (10) and accessible (19) buses.
+const MODE_IDS: Record<TripMode, number[]> = {
+  "commuter train": [0],
+  metro: [2],
+  tram: [4],
+  bus: [5, 10, 19],
+  boat: [9],
+  train: [14],
+};
+
+const ROUTE_TYPES: Record<TripPreference, string> = {
+  fastest: "leasttime",
+  "fewest changes": "leastinterchange",
+  "least walking": "leastwalking",
 };
 
 /** A trip search SL refused for a reason the user can fix. */
@@ -140,7 +156,7 @@ export class SlClient {
   async planTrip(
     from: number | string,
     to: number | string,
-    options: { time?: string; arriveBy?: boolean } = {},
+    options: { time?: string; arriveBy?: boolean; modes?: TripMode[]; prefer?: TripPreference } = {},
   ): Promise<Trip[]> {
     const params = new URLSearchParams({
       type_origin: "any",
@@ -156,6 +172,9 @@ export class SlClient {
       params.set("itd_time", options.time.slice(11, 16).replace(":", ""));
       params.set("itd_trip_date_time_dep_arr", options.arriveBy ? "arr" : "dep");
     }
+    // Naming any mode makes SL use only the named ones.
+    for (const id of (options.modes ?? []).flatMap((mode) => MODE_IDS[mode])) params.set(`incl_mot_${id}`, "true");
+    if (options.prefer) params.set("route_type", ROUTE_TYPES[options.prefer]);
     const data = await this.getJson<{ journeys?: RawJourney[]; systemMessages?: { code: number }[] }>(
       `${JOURNEY_PLANNER_API}/trips?${params}`,
     );
