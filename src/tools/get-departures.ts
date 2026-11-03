@@ -32,7 +32,11 @@ export function registerGetDeparturesTool(server: McpServer, sl: SlClient): void
         if (line) departures = departures.filter((d) => d.line === line);
         if (towards) departures = departures.filter((d) => normalize(d.destination).includes(normalize(towards)));
         if (departures.length === 0) {
-          return text(`No departures from stop ${siteId} in the next ${minutes} minutes with these filters.`);
+          // SL answers an unknown id with no departures too, so say so.
+          return text(
+            `No departures from stop ${siteId} in the next ${minutes} minutes with these filters. ` +
+              "If the id did not come from find_stop, it may not exist.",
+          );
         }
         return text(departures.slice(0, limit).map(formatDeparture).join("\n"));
       } catch (cause) {

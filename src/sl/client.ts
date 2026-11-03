@@ -27,6 +27,16 @@ const PRODUCT_CLASSES: Record<number, string> = {
   14: "train",
 };
 
+// Trip search errors SL explains with a code, from testing them.
+const TRIP_ERRORS: Record<number, string> = {
+  [-8020]: "SL does not know one of the stop ids. Get them from find_stop.",
+  [-4007]: "Start and destination are the same stop, or too close to plan a trip between.",
+  [-4001]: "SL cannot plan trips at that time. It is outside the current timetable, e.g. in the past.",
+};
+
+/** A trip search SL refused for a reason the user can fix. */
+export class TripSearchError extends Error {}
+
 export interface SlClientOptions {
   /** Swap in a fake fetch in tests. */
   fetch?: typeof fetch;
@@ -130,7 +140,11 @@ export class SlClient {
       params.set("itd_time", options.time.slice(11, 16).replace(":", ""));
       params.set("itd_trip_date_time_dep_arr", options.arriveBy ? "arr" : "dep");
     }
-    const data = await this.getJson<{ journeys?: RawJourney[] }>(`${JOURNEY_PLANNER_API}/trips?${params}`);
+    const data = await this.getJson<{ journeys?: RawJourney[]; systemMessages?: { code: number }[] }>(
+      `${JOURNEY_PLANNER_API}/trips?${params}`,
+    );
+    const known = data.systemMessages?.find((m) => TRIP_ERRORS[m.code]);
+    if (!data.journeys?.length && known) throw new TripSearchError(TRIP_ERRORS[known.code]);
     return (data.journeys ?? []).slice(0, MAX_TRIPS).map((journey) => {
       const legs = journey.legs.map(toTripLeg);
       return {

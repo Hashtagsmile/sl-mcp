@@ -57,6 +57,21 @@ describe("server", () => {
     ]);
   });
 
+  it("plan_trip explains an error SL gives a code for", async () => {
+    const body = { systemMessages: [{ type: "error", code: -8020, text: "origin: no matches" }] };
+    session = await connect(new SlClient({ fetch: async () => new Response(JSON.stringify(body)) }));
+    const { text, isError } = await call("plan_trip", { fromSiteId: 1, toSiteId: 9511 });
+    expect(isError).toBe(true);
+    expect(text).toBe("SL does not know one of the stop ids. Get them from find_stop.");
+  });
+
+  it("plan_trip rejects a date that does not exist", async () => {
+    session = await connect(fakeSl);
+    const { text, isError } = await call("plan_trip", { fromSiteId: 9192, toSiteId: 9511, time: "2026-02-30T25:99" });
+    expect(isError).toBe(true);
+    expect(text).toContain("Not a real date and time");
+  });
+
   it("returns an error result when SL is down", async () => {
     session = await connect(new SlClient({ fetch: async () => new Response("", { status: 503 }) }));
     const { text, isError } = await call("get_departures", { siteId: 9192 });
