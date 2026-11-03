@@ -41,6 +41,12 @@ describe("server", () => {
     expect(text).toBe("9511: Sigtuna, Arlanda central (pendeltåg) (commuter train, train)\n5047: Sigtuna, Arlandagymnasiet (bus)");
   });
 
+  it("find_stop rejects a blank query", async () => {
+    session = await connect(fakeSl);
+    const { isError } = await call("find_stop", { query: "   " });
+    expect(isError).toBe(true);
+  });
+
   it("get_departures filters on destination and shows cancellations", async () => {
     session = await connect(fakeSl);
     const { text } = await call("get_departures", { siteId: 9192, towards: "farsta" });

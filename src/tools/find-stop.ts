@@ -4,7 +4,11 @@ import type { SlClient } from "../sl/client.js";
 import { slError, text } from "./result.js";
 
 const inputSchema = z.object({
-  query: z.string().min(1).describe("Stop or station name, e.g. 'Slussen' or 'Arlanda'. Typos are fine."),
+  query: z
+    .string()
+    .trim()
+    .min(1)
+    .describe("Stop or station name, e.g. 'Slussen' or 'Arlanda'. Typos are fine, abbreviations are not."),
   limit: z.number().int().min(1).max(10).default(5).describe("Maximum number of stops to return"),
 });
 
@@ -16,6 +20,7 @@ export function registerFindStopTool(server: McpServer, sl: SlClient): void {
       description:
         "Search Stockholm public transport (SL) stops by name. Returns each stop's id, name and transport modes. " +
         "Stop names only, not street addresses: for an address, search the nearest station or stop. " +
+        "Write names out: 'Tekniska högskolan', not 'KTH'. " +
         "Call this first: get_departures and plan_trip need the id. " +
         "A name can match several stops (e.g. 'Arlanda' gives the train station and bus stops). " +
         "Pick the one whose name and modes fit the question, or ask the user.",
