@@ -150,7 +150,7 @@ export class SlClient {
   }
 
   /**
-   * Up to 3 trips between two places: a site id, or a place id from findPlace.
+   * Up to 3 trips, plus a walk if it takes at most 30 min, between two places: a site id, or a place id from findPlace.
    * `time` is Stockholm time "YYYY-MM-DDTHH:MM"; without it, trips leave from now.
    */
   async planTrip(
@@ -166,6 +166,9 @@ export class SlClient {
       calc_number_of_trips: String(MAX_TRIPS),
       calc_one_direction: "true", // otherwise the first trip has often already left
       gen_c: "false", // skip coordinates: 156 KB -> 61 KB
+      // Also a walk-only trip when it takes at most 30 min, e.g. T-Centralen -> Sergels torg.
+      compute_monomodal_trip_pedestrian: "true",
+      max_time_pedestrian: "30",
     });
     if (options.time) {
       params.set("itd_date", options.time.slice(0, 10).replaceAll("-", ""));
@@ -180,14 +183,17 @@ export class SlClient {
     );
     const known = data.systemMessages?.find((m) => TRIP_ERRORS[m.code]);
     if (!data.journeys?.length && known) throw new TripSearchError(TRIP_ERRORS[known.code]);
-    let journeys = (data.journeys ?? []).slice(0, MAX_TRIPS);
+    const walk = data.journeys?.find(isWalkOnly);
+    const transit = (data.journeys ?? []).filter((journey) => journey !== walk);
+    let journeys = transit.slice(0, MAX_TRIPS);
     // For arrive-by, SL also suggests trips that arrive too late, and the best ones come last.
     if (options.time && options.arriveBy) {
       const latest = options.time.replace("T", " ");
-      journeys = (data.journeys ?? [])
+      journeys = transit
         .filter((journey) => stockholmDateTime.format(arrivalOf(journey)) <= latest)
         .slice(-MAX_TRIPS);
     }
+    if (walk) journeys.push(walk);
     return journeys.map((journey) => {
       const legs: TripLeg[] = [];
       for (const leg of journey.legs.map(toTripLeg)) {
@@ -245,6 +251,10 @@ const stockholmDateTime = new Intl.DateTimeFormat("sv-SE", {
   hour: "2-digit",
   minute: "2-digit",
 });
+
+function isWalkOnly(journey: RawJourney): boolean {
+  return journey.legs.every((leg) => leg.transportation?.product?.name === "footpath");
+}
 
 function arrivalOf(journey: RawJourney): Date {
   const last = journey.legs.at(-1)!.destination;
