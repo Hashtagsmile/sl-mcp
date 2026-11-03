@@ -1,0 +1,118 @@
+[
+  {
+    "version": 1,
+    "created": "2026-09-07T13:42:01.637+02:00",
+    "modified": "2026-09-07T13:42:01.637+02:00",
+    "deviation_case_id": 12541129,
+    "publish": {
+      "from": "2026-09-07T13:42:01.63+02:00",
+      "upto": "2026-11-30T23:30:00+01:00"
+    },
+    "priority": {
+      "importance_level": 2,
+      "influence_level": 3,
+      "urgency_level": 1
+    },
+    "message_variants": [
+      {
+        "header": "Entré vid Östermalmstorg stängd",
+        "details": "Östermalmstorg: Entrén från Grev Turegatan är stängd på grund av underhållsarbete. \n\nEndast hissen är tillgänglig vid entrén från Grev Turegatan, det går inte att använda trapporna. Vi hänvisar till entrén från Birger Jarlsgatan under pågående ombyggnation.\n\nEntrén kommer att vara stängd till och med november 2026. ",
+        "scope_alias": "Tunnelbanans röda linje 13, 14",
+        "language": "sv"
+      }
+    ],
+    "scope": {
+      "stop_areas": [
+        {
+          "id": 2101,
+          "name": "Östermalmstorg",
+          "type": "METROSTN",
+          "transport_authority": 1
+        }
+      ],
+      "lines": [
+        {
+          "id": 13,
+          "transport_authority": 1,
+          "designation": "13",
+          "transport_mode": "METRO",
+          "name": "Röda linjen",
+          "group_of_lines": "tunnelbanans röda linje"
+        },
+        {
+          "id": 14,
+          "transport_authority": 1,
+          "designation": "14",
+          "transport_mode": "METRO",
+          "name": "Röda linjen",
+          "group_of_lines": "tunnelbanans röda linje"
+        }
+      ]
+    }
+  },
+  {
+    "version": 1,
+    "created": "2026-10-28T10:45:08.437+01:00",
+    "modified": "2026-10-28T10:45:08.437+01:00",
+    "deviation_case_id": 13124278,
+    "publish": {
+      "from": "2026-10-28T10:45:08.433+01:00",
+      "upto": "2026-11-16T23:30:00+01:00"
+    },
+    "priority": {
+      "importance_level": 2,
+      "influence_level": 3,
+      "urgency_level": 1
+    },
+    "message_variants": [
+      {
+        "header": "Avstängd hiss vid Brommaplan",
+        "details": "Hissen vid Brommaplan är avstängd på grund av tekniskt fel. Resenärer i behov av hiss hänvisas till angränsande stationer.\n\nHissen beräknas åter vara i drift den 15 november.\n\nHissen omfattas av tillgänglighetsgarantin. För mer information om tillgänglighet, kontakta SL på telefonnummer 020-120 20 22.",
+        "scope_alias": "Tunnelbanans gröna linje 17, 18, 19",
+        "language": "sv"
+      }
+    ],
+    "scope": {
+      "stop_areas": [
+        {
+          "id": 1231,
+          "name": "Brommaplan",
+          "type": "METROSTN",
+          "transport_authority": 1
+        }
+      ],
+      "lines": [
+        {
+          "id": 19,
+          "transport_authority": 1,
+          "designation": "19",
+          "transport_mode": "METRO",
+          "name": "Gröna linjen",
+          "group_of_lines": "tunnelbanans gröna linje"
+        },
+        {
+          "id": 18,
+          "transport_authority": 1,
+          "designation": "18",
+          "transport_mode": "METRO",
+          "name": "Gröna linjen",
+          "group_of_lines": "tunnelbanans gröna linje"
+        },
+        {
+          "id": 17,
+          "transport_authority": 1,
+          "designation": "17",
+          "transport_mode": "METRO",
+          "name": "Gröna linjen",
+          "group_of_lines": "tunnelbanans gröna linje"
+        }
+      ]
+    },
+    "categories": [
+      {
+        "group": "FACILITY",
+        "type": "LIFT"
+      }
+    ]
+  }
+]

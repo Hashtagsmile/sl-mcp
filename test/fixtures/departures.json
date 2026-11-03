@@ -1,0 +1,267 @@
+{
+ "departures": [
+  {
+   "destination": "Norrtull",
+   "direction_code": 2,
+   "direction": "Norrtull",
+   "state": "EXPECTED",
+   "display": "3 min",
+   "scheduled": "2026-11-03T19:51:00",
+   "expected": "2026-11-03T19:51:00",
+   "journey": {
+    "id": 2026110300424,
+    "state": "NORMALPROGRESS",
+    "prediction_state": "NORMAL"
+   },
+   "stop_area": {
+    "id": 11002,
+    "name": "Slussen",
+    "type": "BUSTERM"
+   },
+   "stop_point": {
+    "id": 11017,
+    "name": "Slussen",
+    "designation": "G"
+   },
+   "line": {
+    "id": 2,
+    "designation": "2",
+    "transport_authority_id": 1,
+    "transport_mode": "BUS",
+    "group_of_lines": "Blåbuss"
+   },
+   "deviations": []
+  },
+  {
+   "destination": "Farsta strand",
+   "direction_code": 2,
+   "direction": "Farsta strand",
+   "state": "CANCELLED",
+   "display": "19:50",
+   "scheduled": "2026-11-03T19:50:46",
+   "expected": "2026-11-03T19:51:45",
+   "journey": {
+    "id": 2026110380099,
+    "state": "NORMALPROGRESS",
+    "prediction_state": "NORMAL"
+   },
+   "stop_area": {
+    "id": 1011,
+    "name": "Slussen",
+    "type": "METROSTN"
+   },
+   "stop_point": {
+    "id": 1012,
+    "name": "Slussen",
+    "designation": "4"
+   },
+   "line": {
+    "id": 18,
+    "designation": "18",
+    "transport_authority_id": 1,
+    "transport_mode": "METRO",
+    "group_of_lines": "Tunnelbanans gröna linje"
+   },
+   "deviations": [
+    {
+     "importance_level": 7,
+     "consequence": "CANCELLED",
+     "message": "Inställd"
+    }
+   ]
+  },
+  {
+   "destination": "Karolinska sjukhuset",
+   "direction_code": 2,
+   "direction": "Karolinska sjukhuset",
+   "state": "EXPECTED",
+   "display": "Nu",
+   "scheduled": "2026-11-03T19:52:00",
+   "expected": "2026-11-03T19:53:13",
+   "journey": {
+    "id": 2026110300640,
+    "state": "NORMALPROGRESS",
+    "prediction_state": "NORMAL"
+   },
+   "stop_area": {
+    "id": 11002,
+    "name": "Slussen",
+    "type": "BUSTERM"
+   },
+   "stop_point": {
+    "id": 11018,
+    "name": "Slussen",
+    "designation": "H"
+   },
+   "line": {
+    "id": 3,
+    "designation": "3",
+    "transport_authority_id": 1,
+    "transport_mode": "BUS",
+    "group_of_lines": "Blåbuss"
+   },
+   "deviations": []
+  },
+  {
+   "destination": "Södersjukhuset",
+   "direction_code": 1,
+   "direction": "Södersjukhuset",
+   "state": "EXPECTED",
+   "display": "1 min",
+   "scheduled": "2026-11-03T19:53:00",
+   "expected": "2026-11-03T19:53:59",
+   "journey": {
+    "id": 2026110300531,
+    "state": "NORMALPROGRESS",
+    "prediction_state": "NORMAL"
+   },
+   "stop_area": {
+    "id": 11002,
+    "name": "Slussen",
+    "type": "BUSTERM"
+   },
+   "stop_point": {
+    "id": 11014,
+    "name": "Slussen",
+    "designation": "D"
+   },
+   "line": {
+    "id": 3,
+    "designation": "3",
+    "transport_authority_id": 1,
+    "transport_mode": "BUS",
+    "group_of_lines": "Blåbuss"
+   },
+   "deviations": []
+  },
+  {
+   "destination": "Västra Orminge",
+   "direction_code": 1,
+   "direction": "Västra Orminge",
+   "state": "ATSTOP",
+   "display": "1 min",
+   "scheduled": "2026-11-03T19:54:00",
+   "expected": "2026-11-03T19:54:00",
+   "journey": {
+    "id": 2026110300267,
+    "state": "NORMALPROGRESS",
+    "prediction_state": "NORMAL"
+   },
+   "stop_area": {
+    "id": 44000,
+    "name": "Slussen",
+    "type": "BUSTERM"
+   },
+   "stop_point": {
+    "id": 44002,
+    "name": "Slussen",
+    "designation": "C"
+   },
+   "line": {
+    "id": 471,
+    "designation": "471",
+    "transport_authority_id": 1,
+    "transport_mode": "BUS",
+    "group_of_lines": "Blåbuss"
+   },
+   "deviations": []
+  },
+  {
+   "destination": "Mörby centrum",
+   "direction_code": 1,
+   "direction": "Mörby centrum",
+   "state": "EXPECTED",
+   "display": "1 min",
+   "scheduled": "2026-11-03T19:53:36",
+   "expected": "2026-11-03T19:54:20",
+   "journey": {
+    "id": 2026110320872,
+    "state": "NORMALPROGRESS",
+    "prediction_state": "NORMAL"
+   },
+   "stop_area": {
+    "id": 1011,
+    "name": "Slussen",
+    "type": "METROSTN"
+   },
+   "stop_point": {
+    "id": 2011,
+    "name": "Slussen",
+    "designation": "2"
+   },
+   "line": {
+    "id": 14,
+    "designation": "14",
+    "transport_authority_id": 1,
+    "transport_mode": "METRO",
+    "group_of_lines": "Tunnelbanans röda linje"
+   },
+   "deviations": []
+  },
+  {
+   "destination": "Alvik",
+   "direction_code": 1,
+   "direction": "Hässelby strand",
+   "state": "EXPECTED",
+   "display": "2 min",
+   "scheduled": "2026-11-03T19:54:18",
+   "expected": "2026-11-03T19:54:44",
+   "journey": {
+    "id": 2026110311073,
+    "state": "NORMALPROGRESS",
+    "prediction_state": "NORMAL"
+   },
+   "stop_area": {
+    "id": 1011,
+    "name": "Slussen",
+    "type": "METROSTN"
+   },
+   "stop_point": {
+    "id": 1011,
+    "name": "Slussen",
+    "designation": "1"
+   },
+   "line": {
+    "id": 18,
+    "designation": "18",
+    "transport_authority_id": 1,
+    "transport_mode": "METRO",
+    "group_of_lines": "Tunnelbanans gröna linje"
+   },
+   "deviations": []
+  },
+  {
+   "destination": "Fruängen",
+   "direction_code": 2,
+   "direction": "Fruängen",
+   "state": "EXPECTED",
+   "display": "2 min",
+   "scheduled": "2026-11-03T19:55:24",
+   "expected": "2026-11-03T19:55:24",
+   "journey": {
+    "id": 2026110320869,
+    "state": "NORMALPROGRESS",
+    "prediction_state": "NORMAL"
+   },
+   "stop_area": {
+    "id": 1011,
+    "name": "Slussen",
+    "type": "METROSTN"
+   },
+   "stop_point": {
+    "id": 2012,
+    "name": "Slussen",
+    "designation": "3"
+   },
+   "line": {
+    "id": 14,
+    "designation": "14",
+    "transport_authority_id": 1,
+    "transport_mode": "METRO",
+    "group_of_lines": "Tunnelbanans röda linje"
+   },
+   "deviations": []
+  }
+ ],
+ "stop_deviations": []
+}

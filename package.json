@@ -1,0 +1,42 @@
+{
+  "name": "@hashtagsmile/sl-mcp",
+  "version": "0.1.0",
+  "description": "MCP server that gives AI assistants real-time Stockholm public transport (SL) data",
+  "type": "module",
+  "bin": {
+    "sl-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run --passWithNoTests",
+    "inspect": "npm run build && npx @modelcontextprotocol/inspector node dist/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "sl",
+    "stockholm",
+    "public-transport"
+  ],
+  "author": "Hashtagsmile",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Hashtagsmile/sl-mcp.git"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2",
+    "vitest": "^5.1.0"
+  }
+}
