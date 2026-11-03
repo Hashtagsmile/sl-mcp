@@ -1,5 +1,7 @@
 # sl-mcp
 
+[![sl-mcp MCP server score](https://glama.ai/mcp/servers/Hashtagsmile/sl-mcp/badges/score.svg)](https://glama.ai/mcp/servers/Hashtagsmile/sl-mcp)
+
 An MCP server for Stockholm public transport (SL). Connect it to Claude or another MCP client and ask
 about departures, disruptions and trips in plain Swedish or English.
 
@@ -12,12 +14,12 @@ Hur tar jag mig från Sundbyberg till Götgatan 76?
 
 It uses SL's open APIs, which don't need an API key.
 
-## Tools
+An answer looks like this:
 
-- `find_stop`: search for a stop by name and get its id
-- `get_departures`: upcoming departures from a stop, optionally by mode, line or destination
-- `get_disruptions`: announced disruptions for one or more lines
-- `plan_trip`: trips between two stops or street addresses, with changes and walks
+> **Gå 08:31 från Sundbybergs centrum, så är du framme på Götgatan 76 kl 08:58.**
+> 1. **08:31** Tunnelbana 10 mot Kungsträdgården från **spår 2**. Åk 7 stationer till T-Centralen.
+> 2. **08:47** Byt till tunnelbana 17 mot Skarpnäck från **spår 4**. Åk 3 stationer till Medborgarplatsen.
+> 3. **08:52–08:58** Gå ut via uppgång **Folkungagatan Götgatan** och gå 6 min till Götgatan 76.
 
 ## Use it without installing
 
@@ -33,6 +35,17 @@ Streamable HTTP. In Claude Code:
 ```
 claude mcp add --transport http sl https://sl-mcp.miltonlindblad.workers.dev/mcp
 ```
+
+## Tools
+
+- `find_stop`: search for a stop by name, typos are fine, and get its id
+- `get_departures`: live departures from a stop with platform or bus stop letter, delays and cancellations.
+  Filter by mode, line or destination
+- `get_disruptions`: announced disruptions such as track work, broken lifts and replacement buses, by line,
+  mode or metro colour ("grön linje")
+- `plan_trip`: up to 3 trips between stops or street addresses, leaving or arriving at a given time. Each ride
+  shows platform, stops, crowding and delay, and each walk shows minutes and which station exit to use.
+  You can ask for only some modes (e.g. boat) and for fewest changes or least walking
 
 ## Install
 
@@ -90,6 +103,9 @@ npx wrangler deploy   # deploy to your Cloudflare account
 - SL returns at most 3 departures per line and direction.
 - Disruption messages are in Swedish only.
 - There is no "nearest stop" search, since SL has no keyless API for it.
+- SL can't plan step-free trips. For a wheelchair, the tools suggest least walking and checking for broken lifts.
+- Addresses work, business names don't: "Götgatan 76" works, "Sellpy" doesn't.
+- Departures reach at most 3 hours ahead. For later, use `plan_trip` with a time.
 
 ## Data
 
