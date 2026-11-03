@@ -3,7 +3,8 @@ import { z } from "zod";
 import type { SlClient } from "../sl/client.js";
 import { slError, text } from "./result.js";
 
-const MAX_DETAILS = 300;
+// Long enough for nearly all of SL's messages (p90 is under 300) but keeps an unfiltered list short.
+const MAX_DETAILS = 800;
 
 // So "grön linje" or "red line" work as well as line numbers.
 const METRO_COLOURS: [RegExp, string[]][] = [
