@@ -145,7 +145,15 @@ export class SlClient {
     );
     const known = data.systemMessages?.find((m) => TRIP_ERRORS[m.code]);
     if (!data.journeys?.length && known) throw new TripSearchError(TRIP_ERRORS[known.code]);
-    return (data.journeys ?? []).slice(0, MAX_TRIPS).map((journey) => {
+    let journeys = (data.journeys ?? []).slice(0, MAX_TRIPS);
+    // For arrive-by, SL also suggests trips that arrive too late, and the best ones come last.
+    if (options.time && options.arriveBy) {
+      const latest = options.time.replace("T", " ");
+      journeys = (data.journeys ?? [])
+        .filter((journey) => stockholmDateTime.format(arrivalOf(journey)) <= latest)
+        .slice(-MAX_TRIPS);
+    }
+    return journeys.map((journey) => {
       const legs = journey.legs.map(toTripLeg);
       return {
         departure: legs[0]?.departure ?? "",
@@ -185,6 +193,21 @@ const stockholmTime = new Intl.DateTimeFormat("sv-SE", {
   hour: "2-digit",
   minute: "2-digit",
 });
+
+// "2026-11-04 08:30", compares as a string with the "YYYY-MM-DDTHH:MM" input
+const stockholmDateTime = new Intl.DateTimeFormat("sv-SE", {
+  timeZone: "Europe/Stockholm",
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+});
+
+function arrivalOf(journey: RawJourney): Date {
+  const last = journey.legs.at(-1)!.destination;
+  return new Date(last.arrivalTimeEstimated ?? last.arrivalTimePlanned);
+}
 
 function toTripLeg(leg: RawLeg): TripLeg {
   const t = leg.transportation;

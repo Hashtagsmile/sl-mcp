@@ -87,6 +87,13 @@ describe("SlClient", () => {
     await expect(sl.planTrip(9192, 9511)).resolves.toHaveLength(3);
   });
 
+  it("planTrip drops trips that arrive after an arrive-by time", async () => {
+    const { sl } = fakeClient(trips); // the trip arrives 23:46
+
+    await expect(sl.planTrip(9192, 9511, { time: "2026-11-03T23:46", arriveBy: true })).resolves.toHaveLength(1);
+    await expect(sl.planTrip(9192, 9511, { time: "2026-11-03T23:45", arriveBy: true })).resolves.toHaveLength(0);
+  });
+
   it("retries when SL answers 429", async () => {
     let calls = 0;
     const sl = new SlClient({
