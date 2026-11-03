@@ -5,8 +5,18 @@ import { slError, text } from "./result.js";
 
 const MAX_DETAILS = 300;
 
+// So "grön linje" or "red line" work as well as line numbers.
+const METRO_COLOURS: [RegExp, string[]][] = [
+  [/r[öo]d|red/i, ["13", "14"]],
+  [/gr[öo]n|green/i, ["17", "18", "19"]],
+  [/bl[åa]|blue/i, ["10", "11"]],
+];
+
 const inputSchema = z.object({
-  lines: z.array(z.string()).optional().describe("Only these line numbers, e.g. ['13', '14'] for the red metro line"),
+  lines: z
+    .array(z.string())
+    .optional()
+    .describe("Only these line numbers, e.g. ['13', '14'], or metro colours, e.g. ['grön linje']"),
   transportMode: z.enum(["METRO", "BUS", "TRAIN", "TRAM", "SHIP", "FERRY"]).optional().describe("Only this mode"),
 });
 
@@ -24,14 +34,15 @@ export function registerGetDisruptionsTool(server: McpServer, sl: SlClient): voi
     },
     async ({ lines, transportMode }) => {
       try {
-        const disruptions = await sl.getDisruptions({ lines, transportMode });
+        const disruptions = await sl.getDisruptions({ lines: lines?.flatMap(lineNumbers), transportMode });
         if (disruptions.length === 0) return text("No announced disruptions match.");
         return text(
           disruptions
             .map((d) => {
               const details = d.details.length > MAX_DETAILS ? `${d.details.slice(0, MAX_DETAILS)}…` : d.details;
               const until = d.until ? ` (until ${d.until.slice(0, 10)})` : "";
-              return `Lines ${d.lines.join(", ") || "-"}: ${d.header}${until}\n${details}`;
+              const label = d.lines.length === 1 ? "Line" : "Lines";
+              return `${label} ${d.lines.join(", ") || "-"}: ${d.header}${until}\n${details}`;
             })
             .join("\n\n"),
         );
@@ -40,4 +51,8 @@ export function registerGetDisruptionsTool(server: McpServer, sl: SlClient): voi
       }
     },
   );
+}
+
+function lineNumbers(line: string): string[] {
+  return METRO_COLOURS.find(([colour]) => colour.test(line))?.[1] ?? [line];
 }
