@@ -65,9 +65,11 @@ export class SlClient {
     const stops: Stop[] = [];
     for (const location of data.locations ?? []) {
       if (!SITE_GID.test(location.id)) continue;
+      // No transport modes means no departures, e.g. "Sundbyberg, Götgatan".
+      if (!location.productClasses?.length) continue;
       const id = Number(location.id.slice(-6));
       if (stops.some((stop) => stop.id === id)) continue;
-      const modes = (location.productClasses ?? []).map((c) => PRODUCT_CLASSES[c]).filter((m) => m !== undefined);
+      const modes = location.productClasses.map((c) => PRODUCT_CLASSES[c]).filter((m) => m !== undefined);
       stops.push({ id, name: location.name, modes });
     }
     return stops.slice(0, limit);
