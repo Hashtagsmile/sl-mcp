@@ -1,5 +1,8 @@
 # sl-mcp
 
+[![CI](https://github.com/Hashtagsmile/sl-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Hashtagsmile/sl-mcp/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/Hashtagsmile/sl-mcp)](https://github.com/Hashtagsmile/sl-mcp/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![sl-mcp MCP server score](https://glama.ai/mcp/servers/Hashtagsmile/sl-mcp/badges/score.svg)](https://glama.ai/mcp/servers/Hashtagsmile/sl-mcp)
 
 An MCP server for Stockholm public transport (SL). Connect it to Claude or another MCP client and ask
