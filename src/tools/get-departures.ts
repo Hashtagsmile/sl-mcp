@@ -52,8 +52,9 @@ function formatDeparture(d: Departure): string {
   if (d.cancelled) notes.push("CANCELLED");
   const lateMinutes = Math.round((Date.parse(d.expected) - Date.parse(d.scheduled)) / 60_000);
   if (!d.cancelled && lateMinutes > 0) notes.push(`${lateMinutes} min late`);
-  notes.push(...d.deviations);
-  const when = [d.display, ...notes].join(", ");
+  // When cancelled, SL also adds the deviation "Inställd" (cancelled).
+  notes.push(...d.deviations.filter((message) => !(d.cancelled && message === "Inställd")));
+  const when = [d.display === "Nu" ? "now" : d.display, ...notes].join(", ");
   return `${d.line} ${d.transportMode} to ${d.destination} (direction ${d.direction}): ${when}`;
 }
 
