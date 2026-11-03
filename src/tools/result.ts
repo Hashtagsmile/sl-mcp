@@ -10,7 +10,8 @@ export function error(message: string): CallToolResult {
   return { content: [{ type: "text", text: message }], isError: true };
 }
 
-/** Placeholder until a tool is implemented. Remove when all tools are done. */
-export function notImplemented(tool: string): CallToolResult {
-  return error(`${tool} is not implemented yet`);
+/** Turns a failed SL request into an error result. */
+export function slError(cause: unknown): CallToolResult {
+  const reason = cause instanceof Error ? cause.message : String(cause);
+  return error(`Could not get data from SL: ${reason}`);
 }
