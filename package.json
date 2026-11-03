@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsc",
     "test": "vitest run",
-    "inspect": "npm run build && npx @modelcontextprotocol/inspector node dist/index.js"
+    "inspect": "npm run build && mcp-inspector node dist/index.js"
   },
   "engines": {
     "node": ">=20"
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@modelcontextprotocol/client": "^2.4.0",
+    "@modelcontextprotocol/inspector": "^2.13.0",
     "@types/node": "^26.6.6",
     "typescript": "^7.0.2",
     "vitest": "^5.1.0"
