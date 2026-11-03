@@ -243,6 +243,7 @@ function toTripLeg(leg: RawLeg): TripLeg {
     to: shortName(leg.destination.name),
     platform: walk ? undefined : leg.origin.properties?.platformName,
     exit: walk ? exitOf(leg) : undefined,
+    crowding: leg.origin.properties?.occupancy?.toLowerCase().replaceAll("_", " "),
     // stopSequence lists every stop, including where you get on and off.
     stops: !walk && leg.stopSequence?.length ? leg.stopSequence.length - 1 : undefined,
     departure: stockholmTime.format(new Date(leg.origin.departureTimeEstimated ?? leg.origin.departureTimePlanned)),
@@ -303,7 +304,7 @@ interface RawLeg {
     name: string;
     departureTimePlanned: string;
     departureTimeEstimated?: string;
-    properties?: { platformName?: string };
+    properties?: { platformName?: string; occupancy?: string }; // occupancy: MANY_SEATS, FEW_SEATS, STANDING_ONLY
   };
   destination: { name: string; arrivalTimePlanned: string; arrivalTimeEstimated?: string };
   transportation?: { disassembledName?: string; product?: { class?: number; name: string }; destination?: { name: string } };

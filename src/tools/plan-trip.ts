@@ -69,7 +69,7 @@ function formatTrip(trip: Trip, n: number): string {
       .filter(Boolean)
       .join(" ");
     const from = leg.platform ? `${leg.from} (platform ${leg.platform})` : leg.from;
-    const notes = [leg.stops && (leg.stops === 1 ? "1 stop" : `${leg.stops} stops`)].filter(Boolean);
+    const notes = [leg.stops && (leg.stops === 1 ? "1 stop" : `${leg.stops} stops`), leg.crowding].filter(Boolean);
     const after = notes.length ? ` (${notes.join(", ")})` : "";
     return `  ${leg.departure}-${leg.arrival} ${how[0]!.toUpperCase()}${how.slice(1)}: ${from} -> ${leg.to}${after}`;
   });
