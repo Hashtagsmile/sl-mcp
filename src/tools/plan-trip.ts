@@ -1,7 +1,7 @@
 import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import { type SlClient, TripSearchError } from "../sl/client.js";
-import type { Trip } from "../sl/types.js";
+import { TRIP_MODES, TRIP_PREFERENCES, type Trip } from "../sl/types.js";
 import { error, slError, text } from "./result.js";
 
 const place = z.union([z.number().int(), z.string().trim().min(1)]);
@@ -16,6 +16,12 @@ const inputSchema = z.object({
     .optional()
     .describe("Stockholm time as YYYY-MM-DDTHH:MM. Leave out to leave now."),
   arriveBy: z.boolean().default(false).describe("true: arrive by `time`. false: leave at `time`."),
+  modes: z
+    .array(z.enum(TRIP_MODES))
+    .min(1)
+    .optional()
+    .describe("Only these modes, e.g. ['boat'] for 'by boat'. Leave out for all."),
+  prefer: z.enum(TRIP_PREFERENCES).default("fastest").describe("What the trips should optimise for"),
 });
 
 export function registerPlanTripTool(server: McpServer, sl: SlClient): void {
@@ -26,11 +32,13 @@ export function registerPlanTripTool(server: McpServer, sl: SlClient): void {
       description:
         "Plan a trip by SL public transport between two stops or street addresses, with every leg, change and walk. " +
         "For a stop, get its id from find_stop. For an address, pass it as text, with the town if it may be ambiguous. " +
-        "Returns up to 3 trips. Times are Stockholm time.",
+        "Returns up to 3 trips. Times are Stockholm time. " +
+        "SL cannot plan step-free trips: for a wheelchair or pram, use prefer 'least walking' " +
+        "and check get_disruptions for broken lifts at the stops.",
       inputSchema,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
-    async ({ from, to, time, arriveBy }) => {
+    async ({ from, to, time, arriveBy, modes, prefer }) => {
       try {
         // Addresses are fuzzy matched ("Sellpy" finds Karusellplan), so say what each one matched.
         const matched: string[] = [];
@@ -42,7 +50,7 @@ export function registerPlanTripTool(server: McpServer, sl: SlClient): void {
           matched.push(`"${place}" matched ${found.name}`);
           return found.id;
         };
-        const trips = await sl.planTrip(await resolve(from), await resolve(to), { time, arriveBy });
+        const trips = await sl.planTrip(await resolve(from), await resolve(to), { time, arriveBy, modes, prefer });
         if (trips.length === 0) return text("No trips found.");
         const header = matched.length ? [matched.join("\n")] : [];
         return text([...header, ...trips.map((trip, i) => formatTrip(trip, i + 1))].join("\n\n"));

@@ -3,6 +3,12 @@
 
 export type TransportMode = "METRO" | "BUS" | "TRAIN" | "TRAM" | "SHIP" | "FERRY";
 
+// Modes and preferences plan_trip can ask SL for, named like the modes in its output.
+export const TRIP_MODES = ["commuter train", "metro", "tram", "bus", "boat", "train"] as const;
+export type TripMode = (typeof TRIP_MODES)[number];
+export const TRIP_PREFERENCES = ["fastest", "fewest changes", "least walking"] as const;
+export type TripPreference = (typeof TRIP_PREFERENCES)[number];
+
 export interface Stop {
   id: number; // site id, used by get_departures and plan_trip
   name: string; // "Stockholm, Slussen"
