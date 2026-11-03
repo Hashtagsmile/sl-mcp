@@ -1,5 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/server";
 import { SlClient } from "./sl/client.js";
+import { registerPrompts } from "./prompts.js";
 import { registerTools } from "./tools/index.js";
 
 export const SERVER_VERSION = "0.2.0";
@@ -13,11 +14,12 @@ The best trip arrives in time with the fewest changes. Use only times and places
 For a street address, pass it to plan_trip instead of planning to a nearby stop. Mention delays, disruptions and crowding (few seats, standing only) only if they affect the trip.`;
 
 /**
- * Builds a server with all tools registered, without connecting it to a transport.
+ * Builds a server with all tools and prompts registered, without connecting it to a transport.
  * Pass a client to use test data instead of the real SL APIs.
  */
 export function createServer(sl: SlClient = new SlClient()): McpServer {
   const server = new McpServer({ name: "sl-mcp", version: SERVER_VERSION }, { instructions: INSTRUCTIONS });
   registerTools(server, sl);
+  registerPrompts(server);
   return server;
 }

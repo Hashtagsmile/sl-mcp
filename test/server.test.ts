@@ -35,6 +35,21 @@ describe("server", () => {
     expect(tools.map((t) => t.name).sort()).toEqual(["find_stop", "get_departures", "get_disruptions", "plan_trip"]);
   });
 
+  it("offers prompts that turn into a question", async () => {
+    session = await connect();
+    const { prompts } = await session.client.listPrompts();
+    expect(prompts.map((p) => p.name).sort()).toEqual(["departures", "trip"]);
+
+    const trip = await session.client.getPrompt({
+      name: "trip",
+      arguments: { from: "Sundbyberg", to: "Götgatan 76", arriveBy: "09:00" },
+    });
+    expect(trip.messages[0]?.content).toEqual({
+      type: "text",
+      text: "How do I get from Sundbyberg to Götgatan 76 by SL, arriving by 09:00?",
+    });
+  });
+
   it("tells the model how to answer", async () => {
     session = await connect();
     expect(session.client.getInstructions()).toContain("First line: the direct answer");

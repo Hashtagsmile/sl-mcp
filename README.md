@@ -50,6 +50,13 @@ claude mcp add --transport http sl https://sl-mcp.miltonlindblad.workers.dev/mcp
   shows platform, stops, crowding and delay, and each walk shows minutes and which station exit to use.
   You can ask for only some modes (e.g. boat) and for fewest changes or least walking
 
+### Prompts
+
+Ready-made questions to pick in your client, e.g. as slash commands:
+
+- `trip`: how to get from one place to another, optionally arriving by a given time
+- `departures`: the next departures from a stop
+
 ## Install
 
 Requires Node.js 20 or later.
