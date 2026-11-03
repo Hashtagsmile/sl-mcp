@@ -1,5 +1,5 @@
 import { TtlCache } from "../lib/cache.js";
-import type { Departure, Disruption, Stop, TransportMode, Trip, TripLeg } from "./types.js";
+import type { Departure, Disruption, Place, Stop, TransportMode, Trip, TripLeg } from "./types.js";
 
 // SL's open APIs (no key needed). Notes from testing them: docs/sl-api.md (local, not in git).
 //   GET {JOURNEY_PLANNER_API}/stop-finder   stop search, done by SL
@@ -123,16 +123,29 @@ export class SlClient {
       });
   }
 
+  /** The best match for an address or place, e.g. "Götgatan 76, Stockholm". */
+  async findPlace(query: string): Promise<Place | undefined> {
+    // Filter 0 also finds addresses, which findStop leaves out.
+    const params = new URLSearchParams({ name_sf: query, type_sf: "any", any_obj_filter_sf: "0" });
+    const data = await this.getJson<{ locations?: RawLocation[] }>(`${JOURNEY_PLANNER_API}/stop-finder?${params}`);
+    const best = data.locations?.[0];
+    return best && { id: best.id, name: best.name };
+  }
+
   /**
-   * Up to 3 trips between two sites. `time` is Stockholm time "YYYY-MM-DDTHH:MM";
-   * without it, trips leave from now.
+   * Up to 3 trips between two places: a site id, or a place id from findPlace.
+   * `time` is Stockholm time "YYYY-MM-DDTHH:MM"; without it, trips leave from now.
    */
-  async planTrip(fromSiteId: number, toSiteId: number, options: { time?: string; arriveBy?: boolean } = {}): Promise<Trip[]> {
+  async planTrip(
+    from: number | string,
+    to: number | string,
+    options: { time?: string; arriveBy?: boolean } = {},
+  ): Promise<Trip[]> {
     const params = new URLSearchParams({
       type_origin: "any",
-      name_origin: siteGid(fromSiteId),
+      name_origin: typeof from === "number" ? siteGid(from) : from,
       type_destination: "any",
-      name_destination: siteGid(toSiteId),
+      name_destination: typeof to === "number" ? siteGid(to) : to,
       calc_number_of_trips: String(MAX_TRIPS),
       calc_one_direction: "true", // otherwise the first trip has often already left
       gen_c: "false", // skip coordinates: 156 KB -> 61 KB
@@ -156,7 +169,13 @@ export class SlClient {
         .slice(-MAX_TRIPS);
     }
     return journeys.map((journey) => {
-      const legs = journey.legs.map(toTripLeg);
+      const legs: TripLeg[] = [];
+      for (const leg of journey.legs.map(toTripLeg)) {
+        const previous = legs.at(-1);
+        // SL splits a walk at a station exit, e.g. "Medborgarplatsen -> Medborgarplatsen -> Götgatan 76".
+        if (previous?.mode === "walk" && leg.mode === "walk") Object.assign(previous, { to: leg.to, arrival: leg.arrival });
+        else legs.push(leg);
+      }
       return {
         departure: legs[0]?.departure ?? "",
         arrival: legs.at(-1)?.arrival ?? "",
