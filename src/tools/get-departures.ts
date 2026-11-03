@@ -9,7 +9,7 @@ const inputSchema = z.object({
   transportMode: z.enum(["METRO", "BUS", "TRAIN", "TRAM", "SHIP", "FERRY"]).optional().describe("Only this mode"),
   line: z.string().optional().describe("Only this line number, e.g. '14' or '43X'"),
   towards: z.string().optional().describe("Only departures whose final destination contains this, e.g. 'Ropsten'"),
-  minutes: z.number().int().min(1).max(180).default(60).describe("How far ahead to look"),
+  minutes: z.number().int().min(1).max(180).default(60).describe("How many minutes ahead to look, at most 180"),
   limit: z.number().int().min(1).max(30).default(10).describe("Maximum number of departures"),
 });
 
@@ -19,10 +19,13 @@ export function registerGetDeparturesTool(server: McpServer, sl: SlClient): void
     {
       title: "Get departures",
       description:
-        "Live departures from an SL stop, soonest first, with delays and cancellations. " +
-        "SL returns at most 3 departures per line and direction. " +
-        "`towards` matches the final destination only. For a station on the way (e.g. 'mot T-Centralen' from Slussen), " +
-        "leave it out and pick the right direction (1 or 2) from the results.",
+        "List live departures from one SL stop, soonest first: line, mode, final destination, direction (1 or 2), " +
+        "platform or bus stop letter, minutes or clock time, delay, cancellation and SL's notes. " +
+        "Use it for 'when does the next X leave from Y'. To get from A to B, use plan_trip; " +
+        "for announced track work or broken lifts, use get_disruptions. " +
+        "Real-time data from SL: at most 3 departures per line and direction, up to 3 hours ahead. " +
+        "`towards` matches the final destination only: for a station on the way (e.g. 'mot T-Centralen' from Slussen), " +
+        "leave it out and pick the direction from the results. An unknown siteId gives no departures, not an error.",
       inputSchema,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },

@@ -18,12 +18,12 @@ export function registerFindStopTool(server: McpServer, sl: SlClient): void {
     {
       title: "Find stop",
       description:
-        "Search Stockholm public transport (SL) stops by name. Returns each stop's id, name and transport modes. " +
-        "Stops only: for a trip to a street address, pass the address to plan_trip directly. " +
-        "Write names out: 'Tekniska högskolan', not 'KTH'. " +
-        "Call this first: get_departures and plan_trip need the id. " +
-        "A name can match several stops (e.g. 'Arlanda' gives the train station and bus stops). " +
-        "Pick the one whose name and modes fit the question, or ask the user.",
+        "Find Stockholm public transport (SL) stops by name and return their ids, names and transport modes. " +
+        "Use it to get the siteId for get_departures, or a stop id for plan_trip. " +
+        "Not for street addresses: pass those to plan_trip as text instead. " +
+        "A name can match several stops ('Arlanda' gives the train station and bus stops): pick by name and modes, " +
+        "or ask the user. Typos are fine, abbreviations are not: write 'Tekniska högskolan', not 'KTH'. " +
+        "Returns one line per stop: '<id>: <town>, <name> (<modes>)'.",
       inputSchema,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
