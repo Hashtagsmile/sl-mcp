@@ -42,6 +42,7 @@ export interface TripLeg {
   platform?: string; // where it leaves from: track for trains, platform for metro, stop letter for buses
   stops?: number; // stations to ride, not counting where you get on
   crowding?: string; // when you get on: "many seats", "few seats" or "standing only"
+  lateMinutes?: number; // how late it leaves compared with the timetable
   exit?: string; // walks only: the station entrance used, in or out ("uppgång"), e.g. "Folkungagatan Götgatan"
   from: string;
   to: string;
