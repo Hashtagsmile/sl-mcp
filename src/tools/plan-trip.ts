@@ -35,7 +35,8 @@ export function registerPlanTripTool(server: McpServer, sl: SlClient): void {
         // Addresses are fuzzy matched ("Sellpy" finds Karusellplan), so say what each one matched.
         const matched: string[] = [];
         const resolve = async (place: number | string) => {
-          if (typeof place === "number") return place;
+          // A client with an old schema may send a stop id as text, e.g. "9001".
+          if (typeof place === "number" || /^\d+$/.test(place)) return Number(place);
           const found = await sl.findPlace(place);
           if (!found) throw new TripSearchError(`SL found no address or stop matching "${place}".`);
           matched.push(`"${place}" matched ${found.name}`);
@@ -65,7 +66,8 @@ function formatTrip(trip: Trip, n: number): string {
   const changes = trip.changes === 1 ? "1 change" : `${trip.changes} changes`;
   const legs = trip.legs.map((leg) => {
     const how = `${leg.mode} ${leg.line ?? ""}${leg.towards ? ` towards ${leg.towards}` : ""}`.trim();
-    return `  ${leg.departure}-${leg.arrival} ${how[0]!.toUpperCase()}${how.slice(1)}: ${leg.from} -> ${leg.to}`;
+    const from = leg.platform ? `${leg.from} (platform ${leg.platform})` : leg.from;
+    return `  ${leg.departure}-${leg.arrival} ${how[0]!.toUpperCase()}${how.slice(1)}: ${from} -> ${leg.to}`;
   });
   return [`Trip ${n}: ${trip.departure} -> ${trip.arrival} (${trip.minutes} min, ${changes})`, ...legs].join("\n");
 }

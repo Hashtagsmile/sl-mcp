@@ -239,6 +239,7 @@ function toTripLeg(leg: RawLeg): TripLeg {
     towards: walk ? undefined : t?.destination?.name,
     from: shortName(leg.origin.name),
     to: shortName(leg.destination.name),
+    platform: walk ? undefined : leg.origin.properties?.platformName,
     departure: stockholmTime.format(new Date(leg.origin.departureTimeEstimated ?? leg.origin.departureTimePlanned)),
     arrival: stockholmTime.format(new Date(leg.destination.arrivalTimeEstimated ?? leg.destination.arrivalTimePlanned)),
   };
@@ -283,7 +284,12 @@ interface RawJourney {
 }
 
 interface RawLeg {
-  origin: { name: string; departureTimePlanned: string; departureTimeEstimated?: string };
+  origin: {
+    name: string;
+    departureTimePlanned: string;
+    departureTimeEstimated?: string;
+    properties?: { platformName?: string };
+  };
   destination: { name: string; arrivalTimePlanned: string; arrivalTimeEstimated?: string };
   transportation?: { disassembledName?: string; product?: { class?: number; name: string }; destination?: { name: string } };
 }

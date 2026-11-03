@@ -69,6 +69,22 @@ describe("server", () => {
     ]);
   });
 
+  it("plan_trip shows the platform and takes a stop id sent as text", async () => {
+    const withPlatform = structuredClone(trips);
+    Object.assign(withPlatform.journeys[0]!.legs[0]!.origin, { properties: { platformName: "2" } });
+    const urls: string[] = [];
+    const sl = new SlClient({
+      fetch: async (input) => {
+        urls.push(String(input));
+        return new Response(JSON.stringify(withPlatform));
+      },
+    });
+    session = await connect(sl);
+    const { text } = await call("plan_trip", { from: "9192", to: 9511 });
+    expect(urls).toHaveLength(1);
+    expect(text).toContain("Metro 17 towards Odenplan: Slussen, Stockholm (platform 2) -> Odenplan, Stockholm");
+  });
+
   it("plan_trip says which place an address matched", async () => {
     const place = { locations: [{ id: "streetID:1", name: "Stockholm, Götgatan 76" }] };
     const sl = new SlClient({
