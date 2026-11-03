@@ -3,7 +3,7 @@ import { SlClient } from "./sl/client.js";
 import { registerPrompts } from "./prompts.js";
 import { registerTools } from "./tools/index.js";
 
-export const SERVER_VERSION = "0.2.0";
+export const SERVER_VERSION = "0.3.0";
 
 // How the model should answer, so travel answers are short and easy to follow.
 const INSTRUCTIONS = `Answer travel questions like a friend who knows SL, in the user's language.
