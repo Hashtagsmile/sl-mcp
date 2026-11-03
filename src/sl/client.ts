@@ -244,6 +244,7 @@ function toTripLeg(leg: RawLeg): TripLeg {
     platform: walk ? undefined : leg.origin.properties?.platformName,
     exit: walk ? exitOf(leg) : undefined,
     crowding: leg.origin.properties?.occupancy?.toLowerCase().replaceAll("_", " "),
+    lateMinutes: lateMinutes(leg.origin.departureTimePlanned, leg.origin.departureTimeEstimated),
     // stopSequence lists every stop, including where you get on and off.
     stops: !walk && leg.stopSequence?.length ? leg.stopSequence.length - 1 : undefined,
     departure: stockholmTime.format(new Date(leg.origin.departureTimeEstimated ?? leg.origin.departureTimePlanned)),
@@ -253,6 +254,12 @@ function toTripLeg(leg: RawLeg): TripLeg {
 
 // In SL's walk details, area type 32 is a station entrance, e.g. "Folkungagatan Götgatan" at Medborgarplatsen.
 const ENTRANCE_AREA = 32;
+
+/** Whole minutes late, or undefined when on time or without real time. */
+function lateMinutes(planned: string, estimated?: string): number | undefined {
+  const late = estimated ? Math.round((Date.parse(estimated) - Date.parse(planned)) / 60_000) : 0;
+  return late > 0 ? late : undefined;
+}
 
 /** The station entrance a walk goes through, in or out. */
 function exitOf(leg: RawLeg): string | undefined {

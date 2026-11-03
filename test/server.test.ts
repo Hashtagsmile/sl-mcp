@@ -69,10 +69,11 @@ describe("server", () => {
     ]);
   });
 
-  it("plan_trip shows platform, stops and crowding, and takes a stop id sent as text", async () => {
+  it("plan_trip shows platform, stops, crowding and delay, and takes a stop id sent as text", async () => {
     const withPlatform = structuredClone(trips);
     Object.assign(withPlatform.journeys[0]!.legs[0]!.origin, { properties: { platformName: "2", occupancy: "STANDING_ONLY" } });
     Object.assign(withPlatform.journeys[0]!.legs[0]!, { stopSequence: [{}, {}, {}] });
+    Object.assign(withPlatform.journeys[0]!.legs[0]!.origin, { departureTimeEstimated: "2026-11-03T21:59:00Z" });
     const urls: string[] = [];
     const sl = new SlClient({
       fetch: async (input) => {
@@ -83,7 +84,7 @@ describe("server", () => {
     session = await connect(sl);
     const { text } = await call("plan_trip", { from: "9192", to: 9511 });
     expect(urls).toHaveLength(1);
-    expect(text).toContain("Metro 17 towards Odenplan: Slussen, Stockholm (platform 2) -> Odenplan, Stockholm (2 stops, standing only)");
+    expect(text).toContain("Metro 17 towards Odenplan: Slussen, Stockholm (platform 2) -> Odenplan, Stockholm (2 stops, standing only, 2 min late)");
   });
 
   it("plan_trip says which place an address matched", async () => {
