@@ -38,6 +38,7 @@ export interface TripLeg {
   mode: string; // "metro", "commuter train", "bus", "walk"
   line?: string;
   towards?: string;
+  platform?: string; // where it leaves from: track for trains, platform for metro, stop letter for buses
   from: string;
   to: string;
   departure: string; // HH:MM Stockholm time
