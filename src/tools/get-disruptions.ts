@@ -27,9 +27,11 @@ export function registerGetDisruptionsTool(server: McpServer, sl: SlClient): voi
     {
       title: "Get disruptions",
       description:
-        "Announced SL disruptions: track work, closed entrances, broken lifts, replacement buses. " +
-        "Not live delays: use get_departures for those. The text is in Swedish, so translate it if needed. " +
-        "Metro colours: red line = 13, 14; green line = 17, 18, 19; blue line = 10, 11.",
+        "List disruptions SL has announced: track work, closed entrances, broken lifts and replacement buses, " +
+        "with the lines affected and until when. Use it to check a line or the stops of a trip before travelling, " +
+        "e.g. lifts for a wheelchair. For live delays and cancelled departures, use get_departures instead. " +
+        "The text is in Swedish, so translate it if needed, and is cut at 800 characters. " +
+        "Results are cached for 1 minute, as SL asks. Leave both filters out to list everything.",
       inputSchema,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },

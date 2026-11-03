@@ -21,7 +21,7 @@ const inputSchema = z.object({
     .min(1)
     .optional()
     .describe("Only these modes, e.g. ['boat'] for 'by boat'. Leave out for all."),
-  prefer: z.enum(TRIP_PREFERENCES).default("fastest").describe("What the trips should optimise for"),
+  prefer: z.enum(TRIP_PREFERENCES).default("fastest").describe("What to optimise for: fastest (default), fewest changes or least walking"),
 });
 
 export function registerPlanTripTool(server: McpServer, sl: SlClient): void {
@@ -30,9 +30,12 @@ export function registerPlanTripTool(server: McpServer, sl: SlClient): void {
     {
       title: "Plan trip",
       description:
-        "Plan a trip by SL public transport between two stops or street addresses, with every leg, change and walk. " +
-        "For a stop, get its id from find_stop. For an address, pass it as text, with the town if it may be ambiguous. " +
-        "Returns up to 3 trips, plus walking all the way if that takes at most 30 min. Times are Stockholm time. " +
+        "Plan trips by SL public transport between two stops or street addresses, leaving or arriving at a given time. " +
+        "Returns up to 3 trips, plus walking all the way when that takes at most 30 min. Each ride lists line, " +
+        "direction, platform, stops, crowding and delay; each walk lists minutes and the station exit (uppgång). " +
+        "Use it for 'how do I get to X' and 'when must I leave'; for departures from one stop, use get_departures. " +
+        "Addresses are fuzzy matched, so the result starts with what each one matched. Times are Stockholm time. " +
+        "Unknown stops, the same stop twice and times outside the timetable give a clear error. " +
         "SL cannot plan step-free trips: for a wheelchair or pram, use prefer 'least walking' " +
         "and check get_disruptions for broken lifts at the stops.",
       inputSchema,
