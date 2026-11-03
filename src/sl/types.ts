@@ -24,6 +24,7 @@ export interface Departure {
   scheduled: string; // local time, no offset
   expected: string; // local time, no offset
   cancelled: boolean;
+  platform?: string; // track, platform or bus stop letter, e.g. "G" at Slussen
   deviations: string[];
 }
 

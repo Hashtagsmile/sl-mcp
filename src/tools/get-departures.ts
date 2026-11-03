@@ -46,7 +46,7 @@ export function registerGetDeparturesTool(server: McpServer, sl: SlClient): void
   );
 }
 
-// "14 METRO to Mörby centrum (direction 1): 3 min, 2 min late"
+// "14 METRO to Mörby centrum (direction 1, platform 2): 3 min, 2 min late"
 function formatDeparture(d: Departure): string {
   const notes: string[] = [];
   if (d.cancelled) notes.push("CANCELLED");
@@ -55,7 +55,8 @@ function formatDeparture(d: Departure): string {
   // When cancelled, SL also adds the deviation "Inställd" (cancelled).
   notes.push(...d.deviations.filter((message) => !(d.cancelled && message === "Inställd")));
   const when = [d.display === "Nu" ? "now" : d.display, ...notes].join(", ");
-  return `${d.line} ${d.transportMode} to ${d.destination} (direction ${d.direction}): ${when}`;
+  const where = d.platform ? `direction ${d.direction}, platform ${d.platform}` : `direction ${d.direction}`;
+  return `${d.line} ${d.transportMode} to ${d.destination} (${where}): ${when}`;
 }
 
 /** Lowercase without accents, so "sodertalje" matches "Södertälje". */
