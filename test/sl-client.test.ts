@@ -19,6 +19,12 @@ function fakeClient(body: unknown, status = 200) {
 }
 
 describe("SlClient", () => {
+  it("findStop skips stops without transport modes", async () => {
+    const { sl } = fakeClient({ locations: [{ id: "9091001000009918", name: "Sundbyberg, Götgatan" }] });
+
+    await expect(sl.findStop("götgatan")).resolves.toEqual([]);
+  });
+
   it("findStop lets SL search and turns its ids into site ids", async () => {
     const { sl, urls } = fakeClient(stopFinder);
     const stops = await sl.findStop("arlanda");

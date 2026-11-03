@@ -15,6 +15,7 @@ export function registerFindStopTool(server: McpServer, sl: SlClient): void {
       title: "Find stop",
       description:
         "Search Stockholm public transport (SL) stops by name. Returns each stop's id, name and transport modes. " +
+        "Stop names only, not street addresses: for an address, search the nearest station or stop. " +
         "Call this first: get_departures and plan_trip need the id. " +
         "A name can match several stops (e.g. 'Arlanda' gives the train station and bus stops). " +
         "Pick the one whose name and modes fit the question, or ask the user.",
