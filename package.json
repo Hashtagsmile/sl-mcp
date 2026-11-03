@@ -11,6 +11,8 @@
   ],
   "scripts": {
     "build": "tsc",
+    "dev": "tsc --watch",
+    "start": "node dist/index.js",
     "test": "vitest run",
     "inspect": "npm run build && mcp-inspector node dist/index.js"
   },
