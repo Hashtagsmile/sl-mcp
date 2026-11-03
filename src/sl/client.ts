@@ -69,7 +69,8 @@ export class SlClient {
   private readonly disruptions = new TtlCache<RawMessage[]>(60_000);
 
   constructor(options: SlClientOptions = {}) {
-    this.fetch = options.fetch ?? globalThis.fetch;
+    // Wrapped, since Cloudflare Workers throw "Illegal invocation" when fetch is called as a method.
+    this.fetch = options.fetch ?? ((input, init) => fetch(input, init));
     this.timeoutMs = options.timeoutMs ?? 10_000;
     this.retryDelaysMs = options.retryDelaysMs ?? [300, 1000];
   }
