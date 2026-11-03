@@ -1,11 +1,11 @@
 import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import type { SlClient } from "../sl/client.js";
-import { notImplemented } from "./result.js";
+import { slError, text } from "./result.js";
 
 const inputSchema = z.object({
-  query: z.string().describe("TODO: describe for the model, e.g. part of a stop name"),
-  limit: z.number().int().min(1).max(10).default(5).describe("TODO"),
+  query: z.string().min(1).describe("Stop or station name, e.g. 'Slussen' or 'Arlanda'. Typos are fine."),
+  limit: z.number().int().min(1).max(10).default(5).describe("Maximum number of stops to return"),
 });
 
 export function registerFindStopTool(server: McpServer, sl: SlClient): void {
@@ -13,17 +13,22 @@ export function registerFindStopTool(server: McpServer, sl: SlClient): void {
     "find_stop",
     {
       title: "Find stop",
-      // TODO: tell the model what this returns and when to use it (before get_departures).
-      description: "TODO",
+      description:
+        "Search Stockholm public transport (SL) stops by name. Returns each stop's id, name and transport modes. " +
+        "Call this first: get_departures and plan_trip need the id. " +
+        "A name can match several stops (e.g. 'Arlanda' gives the train station and bus stops). " +
+        "Pick the one whose name and modes fit the question, or ask the user.",
       inputSchema,
       annotations: { readOnlyHint: true, openWorldHint: true },
     },
     async ({ query, limit }) => {
-      // TODO: call sl.findStop(query, limit) and return the stops as text.
-      void sl;
-      void query;
-      void limit;
-      return notImplemented("find_stop");
+      try {
+        const stops = await sl.findStop(query, limit);
+        if (stops.length === 0) return text(`No stops found for "${query}". Try another spelling or a nearby station.`);
+        return text(stops.map((s) => `${s.id}: ${s.name} (${s.modes.join(", ") || "unknown modes"})`).join("\n"));
+      } catch (cause) {
+        return slError(cause);
+      }
     },
   );
 }
