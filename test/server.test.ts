@@ -35,6 +35,11 @@ describe("server", () => {
     expect(tools.map((t) => t.name).sort()).toEqual(["find_stop", "get_departures", "get_disruptions", "plan_trip"]);
   });
 
+  it("tells the model how to answer", async () => {
+    session = await connect();
+    expect(session.client.getInstructions()).toContain("First line: the direct answer");
+  });
+
   it("find_stop returns stop ids", async () => {
     session = await connect(fakeSl);
     const { text } = await call("find_stop", { query: "arlanda", limit: 2 });
