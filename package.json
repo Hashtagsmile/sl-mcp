@@ -1,6 +1,6 @@
 {
   "name": "@hashtagsmile/sl-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "MCP server that gives AI assistants real-time Stockholm public transport (SL) data",
   "type": "module",
   "bin": {
