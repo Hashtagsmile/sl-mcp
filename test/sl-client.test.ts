@@ -119,6 +119,31 @@ describe("SlClient", () => {
     expect(trip!.legs).toEqual([expect.objectContaining({ mode: "walk", to: "Götgatan 76", exit: "Folkungagatan Götgatan" })]);
   });
 
+  it("planTrip keeps a walk-only trip last, after up to 3 others", async () => {
+    const walkOnly = {
+      tripDuration: 720,
+      interchanges: 0,
+      legs: [
+        {
+          origin: { name: "Slussen, Stockholm", departureTimePlanned: "2026-11-03T22:00:00Z" },
+          destination: { name: "Medborgarplatsen, Stockholm", arrivalTimePlanned: "2026-11-03T22:12:00Z" },
+          transportation: { product: { class: 99, name: "footpath" } },
+        },
+      ],
+    };
+    const transit = trips.journeys[0]!;
+    const { sl, urls } = fakeClient({ journeys: [walkOnly, transit, transit, transit, transit] });
+
+    const result = await sl.planTrip(9192, 9191);
+    expect(urls[0]).toContain("compute_monomodal_trip_pedestrian=true");
+    expect(result.map((trip) => trip.legs.map((leg) => leg.mode).join("+"))).toEqual([
+      "metro+walk+commuter train",
+      "metro+walk+commuter train",
+      "metro+walk+commuter train",
+      "walk",
+    ]);
+  });
+
   it("planTrip asks SL for only the given modes and the preferred route", async () => {
     const { sl, urls } = fakeClient(trips);
 

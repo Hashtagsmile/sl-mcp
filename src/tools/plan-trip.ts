@@ -32,7 +32,7 @@ export function registerPlanTripTool(server: McpServer, sl: SlClient): void {
       description:
         "Plan a trip by SL public transport between two stops or street addresses, with every leg, change and walk. " +
         "For a stop, get its id from find_stop. For an address, pass it as text, with the town if it may be ambiguous. " +
-        "Returns up to 3 trips. Times are Stockholm time. " +
+        "Returns up to 3 trips, plus walking all the way if that takes at most 30 min. Times are Stockholm time. " +
         "SL cannot plan step-free trips: for a wheelchair or pram, use prefer 'least walking' " +
         "and check get_disruptions for broken lifts at the stops.",
       inputSchema,
